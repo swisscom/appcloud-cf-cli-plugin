@@ -39,21 +39,27 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 
 // Run initiates the plugin
 func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) {
+	var err error
+
 	switch args[0] {
 	case "create-backup":
 		if len(args) < 2 {
-			fmt.Println("Please provide a service instance name")
+			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
 			return
 		}
 
-		p.CreateBackup(cliConnection, args[1])
+		err = p.CreateBackup(cliConnection, args[1])
 	case "backups":
 		if len(args) < 2 {
-			fmt.Println("Please provide a service instance name")
+			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
 			return
 		}
 
-		p.Backups(cliConnection, args[1])
+		err = p.Backups(cliConnection, args[1])
+	}
+
+	if err != nil {
+		fmt.Printf("\n%s\n", redBold(err.Error()))
 	}
 }
 
