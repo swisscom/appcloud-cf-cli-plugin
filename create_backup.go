@@ -1,10 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/plugin"
 )
+
+// CreateBackupResponse is the response from the server from a create backup call
+type CreateBackupResponse struct {
+	ServiceBrokerResponse
+	Backup
+}
 
 // CreateBackup creates a backup for a service instance
 func (p *AppCloudPlugin) CreateBackup(c plugin.CliConnection, serviceInstanceName string) {
@@ -13,24 +21,35 @@ func (p *AppCloudPlugin) CreateBackup(c plugin.CliConnection, serviceInstanceNam
 		username = "you"
 	}
 
-	fmt.Printf("Creating backup for service instance %s as %s...\n", serviceInstanceName, username)
+	fmt.Printf("Creating backup for service instance %s as %s...\n", cyanBold(serviceInstanceName), cyanBold(username))
 
 	s, err := c.GetService(serviceInstanceName)
 	if err != nil {
-		fmt.Printf("\nCouldn't retrieve service instance %s\n", serviceInstanceName)
+		fmt.Printf("\nCouldn't retrieve service instance %s\n", cyanBold(serviceInstanceName))
 		return
 	}
-
-	fmt.Println("This may take a while...")
 
 	url := fmt.Sprintf("/custom/service_instances/%s/backups", s.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "POST", url)
 	if err != nil {
-		fmt.Printf("\nCouldn't retrieve backups for %s\n", serviceInstanceName)
+		fmt.Printf("\nCouldn't retrieve backups for %s\n", cyanBold(serviceInstanceName))
 		return
 	}
 
-	fmt.Print("OK\n\n")
-	fmt.Printf("Backup for service instance %s created\n", serviceInstanceName)
-	fmt.Println(resLines)
+	resString := strings.Join(resLines, "")
+	var bRes CreateBackupResponse
+	err = json.Unmarshal([]byte(resString), &bRes)
+	if err != nil {
+		fmt.Printf("\nCouldn't read JSON response\n")
+		return
+	}
+
+	if bRes.ErrorCode != "" {
+		fmt.Printf("\n%s\n", bRes.Description)
+		return
+	}
+
+	fmt.Print(greenBold("OK\n\n"))
+
+	fmt.Println("Backup in progress")
 }
