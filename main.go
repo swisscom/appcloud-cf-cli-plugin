@@ -33,6 +33,13 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 					Usage: "backups SERVICE_INSTANCE",
 				},
 			},
+			{
+				Name:     "tree",
+				HelpText: "View organization tree",
+				UsageDetails: plugin.Usage{
+					Usage: "tree",
+				},
+			},
 		},
 	}
 }
@@ -56,6 +63,8 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		}
 
 		err = p.Backups(cliConnection, args[1])
+	case "tree":
+		err = p.Tree(cliConnection)
 	}
 
 	if err != nil {
