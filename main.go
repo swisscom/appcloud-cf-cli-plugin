@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/cf/flags"
 )
 
 // AppCloudPlugin is the Swisscom Application Cloud cf CLI plugin
@@ -37,7 +38,10 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "tree",
 				HelpText: "View organization tree",
 				UsageDetails: plugin.Usage{
-					Usage: "tree",
+					Usage: "tree [--level | -l]\n   tree \n   tree -l 2 \n   tree --level 1",
+					Options: map[string]string{
+						"--level, l": "Level of output",
+					},
 				},
 			},
 		},
@@ -64,12 +68,27 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 
 		err = p.Backups(cliConnection, args[1])
 	case "tree":
-		err = p.Tree(cliConnection)
+		fc, err := parseArguments(args)
+		if err != nil {
+			fmt.Println("Incorrect Usage: Level option must be an int")
+			return
+		}
+		value := fc.Int("l")
+
+		err = p.Tree(cliConnection, value)
 	}
 
 	if err != nil {
 		fmt.Printf("\n%s\n", redBold(err.Error()))
 	}
+}
+
+func parseArguments(args []string) (flags.FlagContext, error) {
+	fc := flags.New()
+	fc.NewIntFlagWithDefault("level", "l", "Level of output", 3)
+	err := fc.Parse(args...)
+
+	return fc, err
 }
 
 func main() {

@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 )
 
-func (p *AppCloudPlugin) Tree(c plugin.CliConnection) error {
+func (p *AppCloudPlugin) Tree(c plugin.CliConnection, level int) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
@@ -36,14 +36,14 @@ func (p *AppCloudPlugin) Tree(c plugin.CliConnection) error {
 		return nil
 	}
 
-	TreeOutput(oRes)
+	TreeOutput(oRes, level)
 
 	return nil
 }
 
-func TreeOutput(oRes OrgResponse) {
+func TreeOutput(oRes OrgResponse, level int) {
 
-	output := bold("Org Tree\n")
+	output := bold("Org Tree\n\n")
 	output += bold("Organisations\n")
 
 	for i := 0; i < oRes.TotalResults; i++ {
@@ -56,7 +56,7 @@ func TreeOutput(oRes OrgResponse) {
 
 		output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Name)
 
-		if len(oRes.Resources[i].Spaces) > 0 {
+		if len(oRes.Resources[i].Spaces) > 0 && level > 1 {
 			output += bold("    Spaces\n")
 			for j := 0; j < len(oRes.Resources[i].Spaces); j++ {
 
@@ -68,7 +68,7 @@ func TreeOutput(oRes OrgResponse) {
 
 				output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Spaces[j].Name)
 
-				if len(oRes.Resources[i].Spaces[j].Applications) > 0 {
+				if len(oRes.Resources[i].Spaces[j].Applications) > 0 && level > 2 {
 					output += bold("        Applications\n")
 					for k := 0; k < len(oRes.Resources[i].Spaces[j].Applications); k++ {
 
@@ -82,7 +82,7 @@ func TreeOutput(oRes OrgResponse) {
 					}
 				}
 
-				if len(oRes.Resources[i].Spaces[j].ServiceInstances) > 0 {
+				if len(oRes.Resources[i].Spaces[j].ServiceInstances) > 0 && level > 2 {
 					output += bold("        Services\n")
 					for l := 0; l < len(oRes.Resources[i].Spaces[j].ServiceInstances); l++ {
 
