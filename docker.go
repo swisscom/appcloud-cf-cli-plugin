@@ -14,19 +14,32 @@ func (p *AppCloudPlugin) DockerRepository(c plugin.CliConnection, org string) er
 		username = "you"
 	}
 
+	orgId := ""
+
 	if org == "none" {
 		organization, err := c.GetCurrentOrg()
 		if err != nil {
 			return errors.New("Could not get current organization")
 		}
+		orgId = organization.Guid
+		org = organization.Name
+	} else {
+		curOrg, err := c.GetOrg(org)
+		if err != nil {
+			return errors.New("Could not get organization")
+		}
 
-		org = organization.Guid
-		fmt.Println(organization.Guid)
+		orgId = curOrg.Guid
+	}
+
+	if org == "" {
+		fmt.Println("No organization set.")
+		return nil
 	}
 
 	fmt.Printf("\nRetrieving your repositories for %s as %s...\n\n", org, cyanBold(username))
 
-	url := fmt.Sprintf("/custom/organizations/%s/docker-repositories", org)
+	url := fmt.Sprintf("/custom/organizations/%s/docker-repositories", orgId)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
 		return errors.New("Couldn't retrieve repositories for " + org)
@@ -42,7 +55,7 @@ func (p *AppCloudPlugin) DockerRepository(c plugin.CliConnection, org string) er
 
 	output := ""
 	for i := 0; i < len(dRes.Repositories); i++ {
-		output += dRes.Repositories[i]
+		output += dRes.Repositories[i] + "\n"
 	}
 
 	if output != "" {
