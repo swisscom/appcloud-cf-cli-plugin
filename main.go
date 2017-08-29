@@ -33,6 +33,48 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 					Usage: "backups SERVICE_INSTANCE",
 				},
 			},
+			{
+				Name:     "create-ssl-certificate",
+				HelpText: "A new certificate will be issued and immediately installed",
+				UsageDetails: plugin.Usage{
+					Usage: "create-ssl-certificate ROUTE",
+				},
+			},
+			{
+				Name:     "install-ssl-certificate",
+				HelpText: "A new certificate will be issued and immediately installed",
+				UsageDetails: plugin.Usage{
+					Usage: "install-ssl-certificate ROUTE",
+				},
+			},
+			{
+				Name:     "uninstall-ssl-certificate",
+				HelpText: "A new certificate will be issued and immediately installed",
+				UsageDetails: plugin.Usage{
+					Usage: "uninstall-ssl-certificate ROUTE",
+				},
+			},
+			{
+				Name:     "revoke-ssl-certificate",
+				HelpText: "A new certificate will be issued and immediately installed",
+				UsageDetails: plugin.Usage{
+					Usage: "revoke-ssl-certificate ROUTE",
+				},
+			},
+			{
+				Name:     "abort-ssl-certificate",
+				HelpText: "Abort ssl certificate creation process",
+				UsageDetails: plugin.Usage{
+					Usage: "abort-ssl-certificate ROUTE",
+				},
+			},
+			{
+				Name:     "list-ssl-certificates",
+				HelpText: "A new certificate will be issued and immediately installed",
+				UsageDetails: plugin.Usage{
+					Usage: "list-ssl-certificates",
+				},
+			},
 		},
 	}
 }
@@ -56,6 +98,47 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		}
 
 		err = p.Backups(cliConnection, args[1])
+	case "create-ssl-certificate":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
+			return
+		}
+
+		err = p.CreateSSLCertificate(cliConnection, args[1])
+	case "install-ssl-certificate":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
+			return
+		}
+
+		err = p.InstallSSLCertificate(cliConnection, args[1])
+	case "uninstall-ssl-certificate":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
+			return
+		}
+		err = p.UnInstallSSLCertificate(cliConnection, args[1])
+	case "revoke-ssl-certificate":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
+			return
+		}
+
+		err = p.RevokeSSLCertificate(cliConnection, args[1])
+	case "abort-ssl-certificate":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
+			return
+		}
+
+		err = p.AbortSSLCertificateProcess(cliConnection, args[1])
+	case "list-ssl-certificates":
+		if len(args) < 1 {
+			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
+			return
+		}
+
+		err = p.ListSSLCertificates(cliConnection)
 	}
 
 	if err != nil {
