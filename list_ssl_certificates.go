@@ -26,7 +26,7 @@ func (p *AppCloudPlugin) ListSSLCertificates(c plugin.CliConnection) error {
 
 	url := fmt.Sprintf("/custom/spaces/%s/certificates",s.SpaceFields.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "GET", url)
-	fmt.Println("response:",resLines);
+
 	if err != nil {
 		return fmt.Errorf("Couldn't list all SSL certificate for given space:  %s", s.SpaceFields.Name)
 	}
@@ -35,14 +35,23 @@ func (p *AppCloudPlugin) ListSSLCertificates(c plugin.CliConnection) error {
 	var bRes ListSSLCertResponse
 	err = json.Unmarshal([]byte(resString), &bRes)
 	if err != nil {
-		return errors.New("Couldn't read JSON response")
+		return fmt.Errorf("Couldn't read JSON response: %s", err.Error())
 	}
 
 	if bRes.ErrorCode != "" {
 		return errors.New(bRes.Description)
 	}
-
-	fmt.Print(greenBold("OK\n\n"))
+	fmt.Println("===============================================================================================================================")
+	fmt.Println(greenBold("SSL Certificate                    Status           not_valid_before           not_valid_after                automatic_renewal"))
+	fmt.Println("===============================================================================================================================")
+	for i := 0; i < len(bRes.Resources); i++ {
+		fmt.Println(bRes.Resources[i].Entity.FullDomainName+"          "+bRes.Resources[i].Entity.Status+"     "+bRes.Resources[i].Entity.NotValidBefore+"       "+bRes.Resources[i].Entity.NotValidAfter+" "+bRes.Resources[i].Entity.AutomaticRenewal);
+	}
+	if(len(bRes.Resources)==0){
+		fmt.Println("No certificates found")
+	}
+	fmt.Println("===============================================================================================================================")
+	fmt.Println(greenBold("OK\n\n"))
 
 	fmt.Println("Available SSL certificates retrieved successfully")
 	return nil

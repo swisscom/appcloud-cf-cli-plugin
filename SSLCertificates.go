@@ -2,24 +2,20 @@ package main
 
 // SSL Certificate
 type SSLCertificates struct {
-	TotalResults string `json:"total_results"`
-	TotalPages string `json:"total_pages"`
+	TotalResults int `json:"total_results"`
+	TotalPages int `json:"total_pages"`
 	PrevUrl string `json:"prev_url"`
 	NextUrl string `json:"next_url"`
-	Resources []Resources `json:"resources"`
+	Resources []CertificateData `json:"resources"`
 }
 
-type Resources struct {
+type CertificateData struct {
 		Metadata struct {
 			GUID      string `json:"guid"`
 			URL       string `json:"url"`
 			CreatedAt string `json:"created_at"`
 			UpdatedAt string `json:"updated_at"`
 		} `json:"metadata"`
-		GUID      string `json:"guid"`
-		URL       string `json:"url"`
-		CreatedAt string `json:"created_at"`
-		UpdatedAt string `json:"updated_at"`
 		Entity struct {
 			SpaceID string `json:"space_id"`
 			Status string `json:"status"`
