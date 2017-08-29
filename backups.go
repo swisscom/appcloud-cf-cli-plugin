@@ -49,7 +49,6 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 	if bRes.ErrorCode != "" {
 		return errors.New(bRes.Description)
 	}
-	
 
 	fmt.Print(greenBold("OK\n\n"))
 
@@ -59,9 +58,9 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 		return nil
 	}
 
-	fmt.Println(bold("     created at             last operation"))
+	fmt.Println(bold("     GUID                                   created at             last operation"))
 	for i, b := range backups {
-		fmt.Printf("#%v   %s   %s\n", i, b.Metadata.CreatedAt, formatStatus(b.Entity.Status))
+		fmt.Printf("#%v   %s   %s   %s\n", i, b.Metadata.GUID, b.Metadata.CreatedAt, formatStatus(b.Entity.Status))
 	}
 	return nil
 }
