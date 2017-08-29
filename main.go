@@ -43,21 +43,21 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 			},
 			{
 				Name:     "turn-ssl-on",
-				HelpText: "A new certificate will be issued and immediately installed",
+				HelpText: "Certificate will be disabled for given route",
 				UsageDetails: plugin.Usage{
 					Usage: "turn-ssl-on ROUTE",
 				},
 			},
 			{
 				Name:     "turn-ssl-off",
-				HelpText: "A new certificate will be issued and immediately installed",
+				HelpText: "Certificate will be enabled for given route",
 				UsageDetails: plugin.Usage{
 					Usage: "turn-ssl-off ROUTE",
 				},
 			},
 			{
 				Name:     "revoke-ssl-certificate",
-				HelpText: "A new certificate will be issued and immediately installed",
+				HelpText: "Certificate will be revoked",
 				UsageDetails: plugin.Usage{
 					Usage: "revoke-ssl-certificate ROUTE",
 				},
@@ -71,7 +71,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 			},
 			{
 				Name:     "list-ssl-certificates",
-				HelpText: "A new certificate will be issued and immediately installed",
+				HelpText: "List available certificates for space",
 				UsageDetails: plugin.Usage{
 					Usage: "list-ssl-certificates",
 				},
