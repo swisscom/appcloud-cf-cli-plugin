@@ -110,6 +110,34 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				},
 			},
 			{
+				Name:     "send-org-invitation",
+				HelpText: "Sending invitations to org/space",
+				UsageDetails: plugin.Usage{
+					Usage: "send-org-invitation ORG INVITEE ROLES",
+				},
+			},
+			{
+				Name:     "send-space-invitation",
+				HelpText: "Sending invitations to space",
+				UsageDetails: plugin.Usage{
+					Usage: "send-space-invitation SPACE INVITEE ROLES",
+				},
+			},
+			{
+				Name:     "resend-org-invitation",
+				HelpText: "Resending invitations to org",
+				UsageDetails: plugin.Usage{
+					Usage: "resend-org-invitation ORG INVITEE ROLES",
+				},
+			},
+			{
+				Name:     "resend-space-invitation",
+				HelpText: "Resending invitations to space",
+				UsageDetails: plugin.Usage{
+					Usage: "resend-org-invitation SPACE INVITEE ROLES",
+				},
+			},
+			{
 				Name:     "invitation",
 				HelpText: "View invitations",
 				UsageDetails: plugin.Usage{
@@ -136,6 +164,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 					},
 				},
 			},
+
 		},
 	}
 }
@@ -221,6 +250,25 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		}
 
 		err = p.ListSSLCertificates(cliConnection)
+	case "send-org-invitation":
+		if len(args) < 4 {
+			fmt.Println("Incorrect Usage: the required arguments was not provided")
+			return
+		}
+		err = p.SendOrgInvitation(cliConnection, args[1],args[2],args[3])
+	case "resend-org-invitation":
+		if len(args) < 4 {
+			fmt.Println("Incorrect Usage: the required arguments was not provided")
+			return
+		}
+		err = p.ResendOrgInvitation(cliConnection, args[1],args[2],args[3])
+	case "resend-space-invitation":
+		if len(args) < 4 {
+			fmt.Println("Incorrect Usage: the required arguments was not provided")
+			return
+		}
+		err = p.ResendSpaceInvitation(cliConnection, args[1],args[2],args[3])
+
 	case "tree":
 		fc, err := parseArguments(args)
 		if err != nil {
@@ -230,7 +278,6 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		value := fc.Int("l")
 
 		err = p.Tree(cliConnection, value)
-
 	case "invitation":
 		fc, err := parseArguments(args)
 		if err != nil {
@@ -273,9 +320,15 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		value := strings.ToLower(fc.String("o"))
 
 		err = p.DockerRepository(cliConnection, value)
+
 	}
 
+<<<<<<< HEAD
 	if err != nil {
+=======
+
+    if err != nil {
+>>>>>>> 14471a0f6a63804db269f17d78461fa48fd3fdeb
 		fmt.Printf("\n%s\n", redBold(err.Error()))
 	}
 }

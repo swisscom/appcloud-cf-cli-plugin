@@ -18,6 +18,7 @@ type RevokeSSLCertResponse struct {
 // RevokeSSLCertificate revokes given SSL certificate
 func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, fullDomain string) error {
 	fmt.Printf("Revoking SSL certificate for route %s ...\n", cyanBold(fullDomain))
+	fmt.Print(greenBold("OK\n\n"))
 	// Get the current targeted space details 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
@@ -45,8 +46,7 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, fullDomain
 		return errors.New(bRes.Description)
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
-
+	
 	fmt.Println("SSL certificate revoked successfully")
 	return nil
 }

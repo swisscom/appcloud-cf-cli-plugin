@@ -18,6 +18,7 @@ type AbortSSLCertProcessResponse struct {
 // AbortSSLCertificateProcess: A running certificate creation will be interrupted and aborted
 func (p *AppCloudPlugin) AbortSSLCertificateProcess(c plugin.CliConnection, fullDomain string) error {
 	fmt.Printf("Aborting running SSL certificate creation process for route %s ...\n", cyanBold(fullDomain))
+	fmt.Print(greenBold("OK\n\n"))
 	// Get the current targeted space details 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
@@ -43,8 +44,6 @@ func (p *AppCloudPlugin) AbortSSLCertificateProcess(c plugin.CliConnection, full
 	if bRes.ErrorCode != "" {
 		return errors.New(bRes.Description)
 	}
-
-	fmt.Print(greenBold("OK\n\n"))
 
 	fmt.Println("Aborting SSL certificate creation process completed successfully")
 	return nil

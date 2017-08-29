@@ -65,5 +65,7 @@ func (p *AppCloudPlugin) DockerRepository(c plugin.CliConnection, org string) er
 		fmt.Println("There are no docker repositories for this organization.")
 	}
 
+	fmt.Print(greenBold("OK\n\n"))
+
 	return nil
 }
