@@ -47,8 +47,11 @@ func (p *AppCloudPlugin) ListSSLCertificates(c plugin.CliConnection) error {
 	for i := 0; i < len(bRes.Resources); i++ {
 		fmt.Println(bRes.Resources[i].Entity.FullDomainName+"          "+bRes.Resources[i].Entity.Status+"     "+bRes.Resources[i].Entity.NotValidBefore+"       "+bRes.Resources[i].Entity.NotValidAfter+" "+bRes.Resources[i].Entity.AutomaticRenewal);
 	}
+	if(len(bRes.Resources)==0){
+		fmt.Println("No certificates found")
+	}
 	fmt.Println("===============================================================================================================================")
-	fmt.Print(greenBold("OK\n\n"))
+	fmt.Println(greenBold("OK\n\n"))
 
 	fmt.Println("Available SSL certificates retrieved successfully")
 	return nil
