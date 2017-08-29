@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"code.cloudfoundry.org/cli/plugin"
-	"code.cloudfoundry.org/cli/cf/errors"
-	"strings"
 	"encoding/json"
+	"fmt"
+	"strings"
+
+	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/plugin"
 )
 
 func (p *AppCloudPlugin) DockerRepository(c plugin.CliConnection, org string) error {

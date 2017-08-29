@@ -19,7 +19,7 @@ type InstallSSLCertResponse struct {
 func (p *AppCloudPlugin) TurnSSLOn(c plugin.CliConnection, fullDomain string) error {
 	fmt.Printf("Installing SSL certificate for route %s ...\n", cyanBold(fullDomain))
 	fmt.Print(greenBold("OK\n\n"))
-	// Get the current targeted space details 
+	// Get the current targeted space details
 	s, err := c.GetCurrentSpace()
 	if err != nil {
 		return fmt.Errorf("Couldn't retrieve space")
@@ -29,7 +29,7 @@ func (p *AppCloudPlugin) TurnSSLOn(c plugin.CliConnection, fullDomain string) er
 	//req :=  "'{\"space_id\": \""+s.SpaceFields.Guid+"\","+"\"full_domain_name\":\""+ fullDomain+ "\"}'"
 
 	url := "/custom/certifications/install"
-	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT","-d",req, url)
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", "-d", req, url)
 
 	if err != nil {
 		return fmt.Errorf("Couldn't install SSL certificate for route:  %s", fullDomain)
@@ -45,7 +45,6 @@ func (p *AppCloudPlugin) TurnSSLOn(c plugin.CliConnection, fullDomain string) er
 	if bRes.ErrorCode != "" {
 		return errors.New(bRes.Description)
 	}
-
 
 	fmt.Println("SSL certificate installed successfully")
 	return nil

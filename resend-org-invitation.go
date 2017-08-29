@@ -13,13 +13,13 @@ import (
 type ResendInvitationResponse struct {
 	ServerResponse
 	OrgInvitation
- 	MyInvitations []OrganizationInvitation `json:"resources"`
+	MyInvitations []OrganizationInvitation `json:"resources"`
 }
 
 // CreateBackup creates a backup for a service instance
 func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, orgName string, invitee string, roles string) error {
 
-	fmt.Printf("Resending invitation to ORG %s as %s\n", cyanBold(orgName),cyanBold(roles))
+	fmt.Printf("Resending invitation to ORG %s as %s\n", cyanBold(orgName), cyanBold(roles))
 
 	s, err := c.GetOrg(orgName)
 
@@ -27,10 +27,9 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, orgName str
 		return fmt.Errorf("Couldn't retrieve org details %s, make sure org does exists", orgName)
 	}
 
-	url := fmt.Sprintf("/custom/organizations/%s/invitations",s.Guid)
-	fmt.Printf("Resending invitation to ORG %s as %s\n", cyanBold(url),cyanBold(roles))
+	url := fmt.Sprintf("/custom/organizations/%s/invitations", s.Guid)
+	fmt.Printf("Resending invitation to ORG %s as %s\n", cyanBold(url), cyanBold(roles))
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "GET", url)
-
 
 	if err != nil {
 		return fmt.Errorf("Couldn't get invitations to org %s", orgName)
@@ -51,11 +50,11 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, orgName str
 		return fmt.Errorf("Couldn't Get invitation to invitee  %s", orgName)
 	}
 
-	for i := 0; i < len(bRes.MyInvitations); i++{
-			if (bRes.MyInvitations[i].OrganizationEntity.Invitee==invitee){
+	for i := 0; i < len(bRes.MyInvitations); i++ {
+		if bRes.MyInvitations[i].OrganizationEntity.Invitee == invitee {
 
-			url1 := fmt.Sprintf("/custom/organization_invitations/%s/resend",bRes.MyInvitations[i].Metadata.GUID)
-				resLines2, err1 := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "POST", url1)
+			url1 := fmt.Sprintf("/custom/organization_invitations/%s/resend", bRes.MyInvitations[i].Metadata.GUID)
+			resLines2, err1 := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "POST", url1)
 			resString2 := strings.Join(resLines2, "")
 			var bRes1 OrganizationInvitation
 
@@ -67,6 +66,6 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, orgName str
 	}
 
 	fmt.Println(greenBold("OK\n\n"))
-	fmt.Println("Invitation resent to "+invitee+" for org "+orgName+" successfully")
+	fmt.Println("Invitation resent to " + invitee + " for org " + orgName + " successfully")
 	return nil
 }

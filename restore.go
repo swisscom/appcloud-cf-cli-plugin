@@ -10,6 +10,6 @@ type Restore struct {
 	} `json:"metadata"`
 	Entity struct {
 		BackupID string `json:"service_instance_id"`
-		Status            string `json:"status"`
+		Status   string `json:"status"`
 	} `json:"entity"`
 }

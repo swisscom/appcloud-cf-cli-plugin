@@ -9,12 +9,12 @@ type OrgInvitation struct {
 		UpdatedAt string `json:"updated_at"`
 	} `json:"metadata"`
 	Entity struct {
-		Invitee 		string `json:"invitee"`
-		OrgID   		string `json:"organization_id"`
-		ActorUserName   string `json:"actor_username"`
-		ActorUsreID   	string `json:"actor_user_id"`
-		OrganizationName	string `json:"organization_name"`
-		AvatarUrl   	string `json:"avatar_url"`
-		Status   	string `json:"status"`
+		Invitee          string `json:"invitee"`
+		OrgID            string `json:"organization_id"`
+		ActorUserName    string `json:"actor_username"`
+		ActorUsreID      string `json:"actor_user_id"`
+		OrganizationName string `json:"organization_name"`
+		AvatarUrl        string `json:"avatar_url"`
+		Status           string `json:"status"`
 	} `json:"entity"`
 }

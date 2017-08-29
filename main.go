@@ -164,7 +164,6 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 					},
 				},
 			},
-
 		},
 	}
 }
@@ -255,19 +254,19 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 			fmt.Println("Incorrect Usage: the required arguments was not provided")
 			return
 		}
-		err = p.SendOrgInvitation(cliConnection, args[1],args[2],args[3])
+		err = p.SendOrgInvitation(cliConnection, args[1], args[2], args[3])
 	case "resend-org-invitation":
 		if len(args) < 4 {
 			fmt.Println("Incorrect Usage: the required arguments was not provided")
 			return
 		}
-		err = p.ResendOrgInvitation(cliConnection, args[1],args[2],args[3])
+		err = p.ResendOrgInvitation(cliConnection, args[1], args[2], args[3])
 	case "resend-space-invitation":
 		if len(args) < 4 {
 			fmt.Println("Incorrect Usage: the required arguments was not provided")
 			return
 		}
-		err = p.ResendSpaceInvitation(cliConnection, args[1],args[2],args[3])
+		err = p.ResendSpaceInvitation(cliConnection, args[1], args[2], args[3])
 
 	case "tree":
 		fc, err := parseArguments(args)
@@ -322,7 +321,6 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		err = p.DockerRepository(cliConnection, value)
 
 	}
-
 
 	if err != nil {
 		fmt.Printf("\n%s\n", redBold(err.Error()))

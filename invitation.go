@@ -1,10 +1,11 @@
 package main
 
 import (
-	"code.cloudfoundry.org/cli/plugin"
+	"encoding/json"
 	"fmt"
 	"strings"
-	"encoding/json"
+
+	"code.cloudfoundry.org/cli/plugin"
 )
 
 func (p *AppCloudPlugin) Invitations(c plugin.CliConnection, invitationType string) error {
@@ -65,7 +66,7 @@ func InvitationOutput(c plugin.CliConnection, invitationType string) string {
 		}
 
 		for i := 0; i < res.TotalResults; i++ {
-			output += fmt.Sprintf("%s invited you to organization %s - %s\n", res.Resources[i].OrganizationEntity.ActorUsername , res.Resources[i].OrganizationEntity.OrganizationName, res.Resources[i].Metadata.GUID)
+			output += fmt.Sprintf("%s invited you to organization %s - %s\n", res.Resources[i].OrganizationEntity.ActorUsername, res.Resources[i].OrganizationEntity.OrganizationName, res.Resources[i].Metadata.GUID)
 		}
 
 	case "space":
@@ -84,7 +85,7 @@ func InvitationOutput(c plugin.CliConnection, invitationType string) string {
 
 }
 
-func (p *AppCloudPlugin) AcceptInvitation(c plugin.CliConnection, invitationType string ,invitationGUID string) error {
+func (p *AppCloudPlugin) AcceptInvitation(c plugin.CliConnection, invitationType string, invitationGUID string) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"

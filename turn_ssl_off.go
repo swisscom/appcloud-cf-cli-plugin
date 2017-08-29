@@ -19,7 +19,7 @@ type UnInstallSSLCertResponse struct {
 func (p *AppCloudPlugin) TurnSSLOff(c plugin.CliConnection, fullDomain string) error {
 	fmt.Printf("Uninstalling SSL certificate for route %s ...\n", cyanBold(fullDomain))
 	fmt.Print(greenBold("OK\n\n"))
-	// Get the current targeted space details 
+	// Get the current targeted space details
 	s, err := c.GetCurrentSpace()
 	if err != nil {
 		return fmt.Errorf("Couldn't retrieve space")
@@ -29,7 +29,7 @@ func (p *AppCloudPlugin) TurnSSLOff(c plugin.CliConnection, fullDomain string) e
 	//req :=  "'{\"space_id\": \""+s.SpaceFields.Guid+"\","+"\"full_domain_name\":\""+ fullDomain+ "\"}'"
 
 	url := "/custom/certifications/uninstall"
-	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT","-d",req, url)
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", "-d", req, url)
 
 	if err != nil {
 		return fmt.Errorf("Couldn't uninstall SSL certificate for route:  %s", fullDomain)
@@ -45,7 +45,6 @@ func (p *AppCloudPlugin) TurnSSLOff(c plugin.CliConnection, fullDomain string) e
 	if bRes.ErrorCode != "" {
 		return errors.New(bRes.Description)
 	}
-
 
 	fmt.Println("SSL certificate uninstalled successfully")
 	return nil

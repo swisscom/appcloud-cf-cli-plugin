@@ -18,15 +18,15 @@ type SendInvitationResponse struct {
 // CreateBackup creates a backup for a service instance
 func (p *AppCloudPlugin) SendOrgInvitation(c plugin.CliConnection, orgName string, invitee string, roles string) error {
 
-	fmt.Printf("sending invitation to ORG %s as %s\n", cyanBold(orgName),cyanBold(roles))
-	
+	fmt.Printf("sending invitation to ORG %s as %s\n", cyanBold(orgName), cyanBold(roles))
+
 	s, err := c.GetOrg(orgName)
 	if err != nil {
 		return fmt.Errorf("Couldn't retrieve org details %s, make sure org does exists", orgName)
 	}
 	url := "/custom/organization_invitations"
-   	jsondata := fmt.Sprintf("'{\"invitee\": \"%s\",\"roles\": [\"%s\"], \"organization_id\": \"%s\"}'", invitee, roles, s.Guid)
-   	
+	jsondata := fmt.Sprintf("'{\"invitee\": \"%s\",\"roles\": [\"%s\"], \"organization_id\": \"%s\"}'", invitee, roles, s.Guid)
+
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "POST", "-d", jsondata, url)
 
 	if err != nil {
@@ -46,6 +46,6 @@ func (p *AppCloudPlugin) SendOrgInvitation(c plugin.CliConnection, orgName strin
 
 	fmt.Print(greenBold("OK\n\n"))
 
-	fmt.Println("Sent invitation to "+invitee+" for org "+orgName+" successfully")
+	fmt.Println("Sent invitation to " + invitee + " for org " + orgName + " successfully")
 	return nil
 }

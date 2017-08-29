@@ -19,16 +19,16 @@ type AbortSSLCertProcessResponse struct {
 func (p *AppCloudPlugin) AbortSSLCertificateProcess(c plugin.CliConnection, fullDomain string) error {
 	fmt.Printf("Aborting running SSL certificate creation process for route %s ...\n", cyanBold(fullDomain))
 	fmt.Print(greenBold("OK\n\n"))
-	// Get the current targeted space details 
+	// Get the current targeted space details
 	s, err := c.GetCurrentSpace()
 	if err != nil {
 		return fmt.Errorf("Couldn't retrieve space")
 	}
 
-	req :=  "'{\"space_id\": \""+s.SpaceFields.Guid+"\","+"\"full_domain_name\":\""+ fullDomain+ "\"}'"
+	req := "'{\"space_id\": \"" + s.SpaceFields.Guid + "\"," + "\"full_domain_name\":\"" + fullDomain + "\"}'"
 
 	url := "/custom/certifications/abort"
-	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT","-d",req, url)
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", "-d", req, url)
 
 	if err != nil {
 		return fmt.Errorf("Couldn't abort running SSL certificate creation process for route:  %s", fullDomain)

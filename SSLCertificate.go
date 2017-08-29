@@ -9,12 +9,10 @@ type SSLCertificate struct {
 		UpdatedAt string `json:"updated_at"`
 	} `json:"metadata"`
 	Entity struct {
-		
-		SpaceID string `json:"space_id"`
-		CertificateID string `json:"certificate_id"`
+		SpaceID        string `json:"space_id"`
+		CertificateID  string `json:"certificate_id"`
 		FullDomainName string `json:"full_domain_name"`
-		ProcessType string `json:"process_type"`
-		CurrentStatus string `json:"current_status"`
+		ProcessType    string `json:"process_type"`
+		CurrentStatus  string `json:"current_status"`
 	} `json:"entity"`
 }
-
