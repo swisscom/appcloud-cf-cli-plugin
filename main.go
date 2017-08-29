@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/plugin"
-	"code.cloudfoundry.org/cli/cf/flags"
 	"strings"
+
+	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/plugin"
 )
 
 // AppCloudPlugin is the Swisscom Application Cloud cf CLI plugin
@@ -21,6 +22,13 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 			Build: 1,
 		},
 		Commands: []plugin.Command{
+			{
+				Name:     "restore-backup",
+				HelpText: "Create a restore for a service backup for a service instance",
+				UsageDetails: plugin.Usage{
+					Usage: "restore-backup SERVICE_INSTANCE BACKUP_GUID",
+				},
+			},
 			{
 				Name:     "create-backup",
 				HelpText: "Create a backup for a service instance",
@@ -47,7 +55,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				HelpText: "Invite a user to an organization",
 				UsageDetails: plugin.Usage{
 					Usage: "invite-org-user ORG_NAME INVITEE ROLE1(,ROLE2(,ROLE3))",
-            	},
+				},
 			},
 			{
 				Name:     "create-ssl-certificate",
@@ -137,6 +145,13 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	var err error
 
 	switch args[0] {
+	case "restore-backup":
+		if len(args) < 3 {
+			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE and/or BACKUP_GUID was not provided")
+			return
+		}
+
+		err = p.RestoreBackup(cliConnection, args[1], args[2])
 	case "create-backup":
 		if len(args) < 2 {
 			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
@@ -260,7 +275,7 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		err = p.DockerRepository(cliConnection, value)
 	}
 
-    if err != nil {
+	if err != nil {
 		fmt.Printf("\n%s\n", redBold(err.Error()))
 	}
 }
