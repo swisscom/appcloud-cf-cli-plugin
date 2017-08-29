@@ -28,6 +28,8 @@ func (p *AppCloudPlugin) Invitations(c plugin.CliConnection, invitationType stri
 		output = "You have no invitations."
 	}
 	fmt.Println(output)
+
+	fmt.Print(greenBold("OK\n\n"))
 	return nil
 }
 
@@ -93,6 +95,8 @@ func (p *AppCloudPlugin) AcceptInvitation(c plugin.CliConnection, invitationType
 	output := AcceptInvitationOutput(c, invitationType, invitationGUID)
 
 	fmt.Println(output)
+
+	fmt.Print(greenBold("OK\n\n"))
 	return nil
 }
 
