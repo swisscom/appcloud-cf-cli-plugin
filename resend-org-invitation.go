@@ -66,8 +66,7 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, orgName str
 		}
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
-
+	fmt.Println(greenBold("OK\n\n"))
 	fmt.Println("Invitation resent to "+invitee+" for org "+orgName+" successfully")
 	return nil
 }
