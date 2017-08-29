@@ -323,12 +323,8 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 
 	}
 
-<<<<<<< HEAD
-	if err != nil {
-=======
 
-    if err != nil {
->>>>>>> 14471a0f6a63804db269f17d78461fa48fd3fdeb
+	if err != nil {
 		fmt.Printf("\n%s\n", redBold(err.Error()))
 	}
 }
