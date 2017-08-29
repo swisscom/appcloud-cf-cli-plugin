@@ -14,7 +14,7 @@ func (p *AppCloudPlugin) Tree(c plugin.CliConnection, level int) error {
 		username = "you"
 	}
 
-	fmt.Printf("\nRetrieving your organisation tree as %s...\n", cyanBold(username))
+	fmt.Printf("\nRetrieving your organization tree as %s...\n", cyanBold(username))
 
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "/custom/organizations")
 	if err != nil {
@@ -44,7 +44,7 @@ func (p *AppCloudPlugin) Tree(c plugin.CliConnection, level int) error {
 func TreeOutput(oRes OrgResponse, level int) {
 
 	output := bold("Org Tree\n\n")
-	output += bold("Organisations\n")
+	output += bold("Organizations\n")
 
 	for i := 0; i < oRes.TotalResults; i++ {
 
@@ -57,11 +57,18 @@ func TreeOutput(oRes OrgResponse, level int) {
 		output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Name)
 
 		if len(oRes.Resources[i].Spaces) > 0 && level > 1 {
-			output += bold("    Spaces\n")
+			if i + 1 == oRes.TotalResults {
+				output += bold("    Spaces\n")
+			} else {
+				output += bold("|   Spaces\n")
+			}
 			for j := 0; j < len(oRes.Resources[i].Spaces); j++ {
-
-				if j + 1 == len(oRes.Resources[i].Spaces) {
-					output += "│   └"
+				if j + 1 == len(oRes.Resources[i].Spaces) && i + 1 == oRes.TotalResults {
+					if i + 1 == oRes.TotalResults {
+						output += "    └"
+					} else {
+						output += "│   └"
+					}
 				} else {
 					output += "│   ├"
 				}
@@ -69,11 +76,18 @@ func TreeOutput(oRes OrgResponse, level int) {
 				output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Spaces[j].Name)
 
 				if len(oRes.Resources[i].Spaces[j].Applications) > 0 && level > 2 {
-					output += bold("        Applications\n")
+					if j + 1 == len(oRes.Resources[i].Spaces) && i + 1 == oRes.TotalResults {
+						output += bold("        Applications\n")
+					} else {
+						output += bold("|   |   Applications\n")
+					}
 					for k := 0; k < len(oRes.Resources[i].Spaces[j].Applications); k++ {
-
 						if k + 1 == len(oRes.Resources[i].Spaces[j].Applications) {
-							output += "│   │   └"
+							if j + 1 == len(oRes.Resources[i].Spaces) && i + 1 == oRes.TotalResults {
+								output += "        └"
+							} else {
+								output += "│   │   └"
+							}
 						} else {
 							output += "│   │   ├"
 						}
@@ -83,11 +97,14 @@ func TreeOutput(oRes OrgResponse, level int) {
 				}
 
 				if len(oRes.Resources[i].Spaces[j].ServiceInstances) > 0 && level > 2 {
-					output += bold("        Services\n")
+					output += bold("|   |   Services\n")
 					for l := 0; l < len(oRes.Resources[i].Spaces[j].ServiceInstances); l++ {
-
 						if l + 1 == len(oRes.Resources[i].Spaces[j].ServiceInstances) {
-							output += "│   │   └"
+							if j + 1 == len(oRes.Resources[i].Spaces) && i + 1 == oRes.TotalResults {
+								output += "        └"
+							} else {
+								output += "│   │   └"
+							}
 						} else {
 							output += "│   │   ├"
 						}
