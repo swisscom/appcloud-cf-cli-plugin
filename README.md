@@ -15,3 +15,10 @@ A Plugin for the cf CLI which extends it by the additional features of the Swiss
 
 * `cf backups` Lists all backups for a service instance
 * `cf create-backup` Creates a backup for a service instance
+* `cf create-ssl-certificate` A new certificate will be issued and immediately installed
+* `cf turn-ssl-off` SSL Certificate will be disabled for given route
+* `cf turn-ssl-on` SSL Certificate will be enabled for given route
+* `cf revoke-ssl-certificate` SSL Certificate will be revoked
+* `cf abort-ssl-certificate` SSL Certificate installation process will be aborted
+* `cf list-ssl-certificates` Available SSL Certificates will be listed
+
