@@ -36,6 +36,20 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				},
 			},
 			{
+				Name:     "invite-space-user",
+				HelpText: "Invite a user to a space",
+				UsageDetails: plugin.Usage{
+					Usage: "invite-space-user SPACE_NAME INVITEE ROLE1(,ROLE2(,ROLE3))",
+				},
+			},
+			{
+				Name:     "invite-org-user",
+				HelpText: "Invite a user to an organization",
+				UsageDetails: plugin.Usage{
+					Usage: "invite-org-user ORG_NAME INVITEE ROLE1(,ROLE2(,ROLE3))",
+            	},
+			},
+			{
 				Name:     "create-ssl-certificate",
 				HelpText: "A new certificate will be issued and immediately installed",
 				UsageDetails: plugin.Usage{
@@ -137,6 +151,20 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		}
 
 		err = p.Backups(cliConnection, args[1])
+	case "invite-space-user":
+		if len(args) < 4 {
+			fmt.Println("Incorrect Usage: the required arguments SPACE_NAME, INVITEE and/or ROLES were not provided")
+			return
+		}
+
+		err = p.InviteSpaceUser(cliConnection, args[1], args[2], args[3])
+	case "invite-org-user":
+		if len(args) < 4 {
+			fmt.Println("Incorrect Usage: the required arguments ORG_NAME, INVITEE and/or ROLES were not provided")
+			return
+		}
+
+		err = p.InviteOrgUser(cliConnection, args[1], args[2], args[3])
 	case "create-ssl-certificate":
 		if len(args) < 3 {
 			fmt.Println("Incorrect Usage: the required arguments `DOMAIN`and `ROUTE` was not provided")
@@ -232,7 +260,7 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		err = p.DockerRepository(cliConnection, value)
 	}
 
-	if err != nil {
+    if err != nil {
 		fmt.Printf("\n%s\n", redBold(err.Error()))
 	}
 }
