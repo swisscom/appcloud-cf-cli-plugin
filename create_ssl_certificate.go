@@ -23,8 +23,7 @@ func (p *AppCloudPlugin) CreateSSLCertificate(c plugin.CliConnection, fullDomain
 	if err != nil {
 		return fmt.Errorf("Couldn't retrieve space")
 	}
-
-	req :=  "'{\"space_id\": \""+s.SpaceFields.Guid+"\","+"\"full_domain_name\":\""+ fullDomain+ "\"}'"
+	req := fmt.Sprintf("'{\"space_id\": \"%s\",\"full_domain_name\": \"%s\"}'", s.Guid, fullDomain)
 
 	url := "/custom/certifications/create"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT","-d",req, url)

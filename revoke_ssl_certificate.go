@@ -23,8 +23,9 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, fullDomain
 	if err != nil {
 		return fmt.Errorf("Couldn't retrieve space")
 	}
+	req := fmt.Sprintf("'{\"space_id\": \"%s\",\"full_domain_name\": \"%s\"}'", s.Guid, fullDomain)
 
-	req :=  "'{\"space_id\": \""+s.SpaceFields.Guid+"\","+"\"full_domain_name\":\""+ fullDomain+ "\"}'"
+	//req :=  "'{\"space_id\": \""+s.SpaceFields.Guid+"\","+"\"full_domain_name\":\""+ fullDomain+ "\"}'"
 
 	url := "/custom/certifications/revoke"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT","-d",req, url)

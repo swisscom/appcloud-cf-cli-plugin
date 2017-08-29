@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/cf/flags"
 )
 
 // AppCloudPlugin is the Swisscom Application Cloud cf CLI plugin
@@ -41,17 +42,17 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				},
 			},
 			{
-				Name:     "install-ssl-certificate",
+				Name:     "turn-ssl-on",
 				HelpText: "A new certificate will be issued and immediately installed",
 				UsageDetails: plugin.Usage{
-					Usage: "install-ssl-certificate ROUTE",
+					Usage: "turn-ssl-on ROUTE",
 				},
 			},
 			{
-				Name:     "uninstall-ssl-certificate",
+				Name:     "turn-ssl-off",
 				HelpText: "A new certificate will be issued and immediately installed",
 				UsageDetails: plugin.Usage{
-					Usage: "uninstall-ssl-certificate ROUTE",
+					Usage: "turn-ssl-off ROUTE",
 				},
 			},
 			{
@@ -73,6 +74,16 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				HelpText: "A new certificate will be issued and immediately installed",
 				UsageDetails: plugin.Usage{
 					Usage: "list-ssl-certificates",
+				},
+			},
+			{
+				Name:     "tree",
+				HelpText: "View organization tree",
+				UsageDetails: plugin.Usage{
+					Usage: "tree [--level | -l]\n   tree \n   tree -l 2 \n   tree --level 1",
+					Options: map[string]string{
+						"--level, l": "Level of output",
+					},
 				},
 			},
 		},
@@ -99,25 +110,25 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 
 		err = p.Backups(cliConnection, args[1])
 	case "create-ssl-certificate":
+		if len(args) < 3 {
+			fmt.Println("Incorrect Usage: the required arguments `DOMAIN`and `ROUTE` was not provided")
+			return
+		}
+
+		err = p.CreateSSLCertificate(cliConnection, args[2])
+	case "turn-ssl-on":
 		if len(args) < 2 {
 			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
 			return
 		}
 
-		err = p.CreateSSLCertificate(cliConnection, args[1])
-	case "install-ssl-certificate":
+		err = p.TurnSSLOn(cliConnection, args[1])
+	case "turn-ssl-off":
 		if len(args) < 2 {
 			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
 			return
 		}
-
-		err = p.InstallSSLCertificate(cliConnection, args[1])
-	case "uninstall-ssl-certificate":
-		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
-			return
-		}
-		err = p.UnInstallSSLCertificate(cliConnection, args[1])
+		err = p.TurnSSLOff(cliConnection, args[1])
 	case "revoke-ssl-certificate":
 		if len(args) < 2 {
 			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
@@ -139,11 +150,28 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		}
 
 		err = p.ListSSLCertificates(cliConnection)
+	case "tree":
+		fc, err := parseArguments(args)
+		if err != nil {
+			fmt.Println("Incorrect Usage: Level option must be an int")
+			return
+		}
+		value := fc.Int("l")
+
+		err = p.Tree(cliConnection, value)
 	}
 
 	if err != nil {
 		fmt.Printf("\n%s\n", redBold(err.Error()))
 	}
+}
+
+func parseArguments(args []string) (flags.FlagContext, error) {
+	fc := flags.New()
+	fc.NewIntFlagWithDefault("level", "l", "Level of output", 3)
+	err := fc.Parse(args...)
+
+	return fc, err
 }
 
 func main() {

@@ -7,6 +7,7 @@ A Plugin for the cf CLI which extends it by the additional features of the Swiss
 1. Install [Go](https://golang.org/)
 1. `git clone` this repo into your `$GOPATH`
 1. Run the [Development requirements](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples#development-requirements) commands for cf CLI plugins
+1. Run `go get`
 1. Run `go build`
 1. Run `cf install-plugin appcloud-cf-cli-plugin`
 
