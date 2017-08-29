@@ -14,7 +14,7 @@ func (p *AppCloudPlugin) Tree(c plugin.CliConnection, level int) error {
 		username = "you"
 	}
 
-	fmt.Printf("\nRetrieving your organisation tree as %s...\n", cyanBold(username))
+	fmt.Printf("\nRetrieving your organization tree as %s...\n", cyanBold(username))
 
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "/custom/organizations")
 	if err != nil {
@@ -44,7 +44,7 @@ func (p *AppCloudPlugin) Tree(c plugin.CliConnection, level int) error {
 func TreeOutput(oRes OrgResponse, level int) {
 
 	output := bold("Org Tree\n\n")
-	output += bold("Organisations\n")
+	output += bold("Organizations\n")
 
 	for i := 0; i < oRes.TotalResults; i++ {
 
@@ -57,7 +57,7 @@ func TreeOutput(oRes OrgResponse, level int) {
 		output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Name)
 
 		if len(oRes.Resources[i].Spaces) > 0 && level > 1 {
-			output += bold("    Spaces\n")
+			output += bold("|   Spaces\n")
 			for j := 0; j < len(oRes.Resources[i].Spaces); j++ {
 
 				if j + 1 == len(oRes.Resources[i].Spaces) {
@@ -69,7 +69,7 @@ func TreeOutput(oRes OrgResponse, level int) {
 				output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Spaces[j].Name)
 
 				if len(oRes.Resources[i].Spaces[j].Applications) > 0 && level > 2 {
-					output += bold("        Applications\n")
+					output += bold("|   |   Applications\n")
 					for k := 0; k < len(oRes.Resources[i].Spaces[j].Applications); k++ {
 
 						if k + 1 == len(oRes.Resources[i].Spaces[j].Applications) {
