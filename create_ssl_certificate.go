@@ -18,6 +18,7 @@ type CreateSSLCertResponse struct {
 // CreateSSLCertificate creates a SSL certificate for provided route
 func (p *AppCloudPlugin) CreateSSLCertificate(c plugin.CliConnection, fullDomain string) error {
 	fmt.Printf("Creating SSL certificate for route %s ...\n", cyanBold(fullDomain))
+	fmt.Print(greenBold("OK\n\n"))
 	// Get the current targeted space details 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
@@ -43,7 +44,6 @@ func (p *AppCloudPlugin) CreateSSLCertificate(c plugin.CliConnection, fullDomain
 		return errors.New(bRes.Description)
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
 
 	fmt.Println("SSL certificate creation suceeded")
 	return nil

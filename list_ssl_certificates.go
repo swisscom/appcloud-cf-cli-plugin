@@ -20,6 +20,7 @@ func (p *AppCloudPlugin) ListSSLCertificates(c plugin.CliConnection) error {
 	// Get the current targeted space details 
 	s, err := c.GetCurrentSpace()
 	fmt.Printf("Listing SSL certificates for provided space %s ...\n", cyanBold(s.Name))
+	fmt.Println(greenBold("OK\n\n"))
 	if err != nil {
 		return fmt.Errorf("Couldn't retrieve space")
 	}
@@ -51,7 +52,6 @@ func (p *AppCloudPlugin) ListSSLCertificates(c plugin.CliConnection) error {
 		fmt.Println("No certificates found")
 	}
 	fmt.Println("===============================================================================================================================")
-	fmt.Println(greenBold("OK\n\n"))
 
 	fmt.Println("Available SSL certificates retrieved successfully")
 	return nil

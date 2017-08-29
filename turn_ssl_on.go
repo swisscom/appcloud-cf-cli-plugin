@@ -18,6 +18,7 @@ type InstallSSLCertResponse struct {
 // InstallSSLCertificate installs given SSL certificate
 func (p *AppCloudPlugin) TurnSSLOn(c plugin.CliConnection, fullDomain string) error {
 	fmt.Printf("Installing SSL certificate for route %s ...\n", cyanBold(fullDomain))
+	fmt.Print(greenBold("OK\n\n"))
 	// Get the current targeted space details 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
@@ -45,7 +46,6 @@ func (p *AppCloudPlugin) TurnSSLOn(c plugin.CliConnection, fullDomain string) er
 		return errors.New(bRes.Description)
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
 
 	fmt.Println("SSL certificate installed successfully")
 	return nil
