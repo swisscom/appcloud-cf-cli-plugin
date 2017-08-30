@@ -26,8 +26,6 @@ func (p *AppCloudPlugin) TurnSSLOff(c plugin.CliConnection, fullDomain string) e
 	}
 	req := fmt.Sprintf("'{\"space_id\": \"%s\",\"full_domain_name\": \"%s\"}'", s.Guid, fullDomain)
 
-	//req :=  "'{\"space_id\": \""+s.SpaceFields.Guid+"\","+"\"full_domain_name\":\""+ fullDomain+ "\"}'"
-
 	url := "/custom/certifications/uninstall"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", "-d", req, url)
 

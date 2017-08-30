@@ -26,8 +26,6 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, fullDomain
 	}
 	req := fmt.Sprintf("'{\"space_id\": \"%s\",\"full_domain_name\": \"%s\"}'", s.Guid, fullDomain)
 
-	//req :=  "'{\"space_id\": \""+s.SpaceFields.Guid+"\","+"\"full_domain_name\":\""+ fullDomain+ "\"}'"
-
 	url := "/custom/certifications/revoke"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", "-d", req, url)
 
@@ -36,10 +34,10 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, fullDomain
 	}
 
 	resString := strings.Join(resLines, "")
-	var bRes InstallSSLCertResponse
+	var bRes RevokeSSLCertResponse
 	err = json.Unmarshal([]byte(resString), &bRes)
 	if err != nil {
-		return errors.New("Couldn't read JSON response")
+		return fmt.Errorf("Couldn't read JSON response: %s", err.Error())
 	}
 
 	if bRes.ErrorCode != "" {

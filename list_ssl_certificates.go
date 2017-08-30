@@ -49,7 +49,7 @@ func (p *AppCloudPlugin) ListSSLCertificates(c plugin.CliConnection) error {
 		fmt.Println(bRes.Resources[i].Entity.FullDomainName + "          " + bRes.Resources[i].Entity.Status + "     " + bRes.Resources[i].Entity.NotValidBefore + "       " + bRes.Resources[i].Entity.NotValidAfter + " " + bRes.Resources[i].Entity.AutomaticRenewal)
 	}
 	if len(bRes.Resources) == 0 {
-		fmt.Println("No certificates found")
+		fmt.Println("No certificates exists in space %s"+s.Name)
 	}
 	fmt.Println("===============================================================================================================================")
 
