@@ -164,6 +164,13 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 					},
 				},
 			},
+			{
+				Name:     "service-events",
+				HelpText: "Show service events for SERVICE_INSTANCE",
+				UsageDetails: plugin.Usage{
+					Usage: "service-events  SERVICE_INSTANCE",
+				},
+			},
 		},
 	}
 }
@@ -319,7 +326,13 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		value := strings.ToLower(fc.String("o"))
 
 		err = p.DockerRepository(cliConnection, value)
+	case "service-events":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required arguments was not provided")
+			return
+		}
 
+		err = p.ServiceEvents(cliConnection, args[1])
 	}
 
 	if err != nil {

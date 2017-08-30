@@ -21,4 +21,5 @@ A Plugin for the cf CLI which extends it by the additional features of the Swiss
 * `cf revoke-ssl-certificate` SSL Certificate will be revoked
 * `cf abort-ssl-certificate` SSL Certificate installation process will be aborted
 * `cf list-ssl-certificates` Available SSL Certificates will be listed
+* `cf service-events` Lists all events for service instance
 
