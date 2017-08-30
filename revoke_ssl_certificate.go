@@ -12,7 +12,7 @@ import (
 // RevokeSSLCertResponse is the response from the server from a certificate revokation call
 type RevokeSSLCertResponse struct {
 	SSLCertificate
-	ServerResponse
+	ServerResponseError
 }
 
 // RevokeSSLCertificate revokes given SSL certificate

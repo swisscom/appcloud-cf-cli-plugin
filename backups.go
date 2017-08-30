@@ -11,12 +11,12 @@ import (
 
 // BackupsResponse is the response of the server to a get backups call
 type BackupsResponse struct {
-	ServiceBrokerResponse
 	TotalResult int      `json:"total_results"`
 	TotalPages  int      `json:"total_pages"`
 	PrevURL     string   `json:"prev_url"`
 	NextURL     string   `json:"next_url"`
 	Resources   []Backup `json:"resources"`
+	ServerResponseError
 }
 
 // Backups lists all backups for a service instance
@@ -30,7 +30,7 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 
 	s, err := c.GetService(serviceInstanceName)
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve service instance %s", serviceInstanceName)
+		return fmt.Errorf("Service instance %s not found", serviceInstanceName)
 	}
 
 	url := fmt.Sprintf("/custom/service_instances/%s/backups", s.Guid)
@@ -43,7 +43,7 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 	var bRes BackupsResponse
 	err = json.Unmarshal([]byte(resString), &bRes)
 	if err != nil {
-		return errors.New("Couldn't read JSON response")
+		return errors.New("Couldn't read JSON response from server")
 	}
 
 	if bRes.ErrorCode != "" {
@@ -58,9 +58,9 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 		return nil
 	}
 
-	fmt.Println(bold("     GUID                                   created at             last operation"))
+	fmt.Println(bold("     created at             GUID                                   last operation"))
 	for i, b := range backups {
-		fmt.Printf("#%v   %s   %s   %s\n", i, b.Metadata.GUID, b.Metadata.CreatedAt, formatStatus(b.Entity.Status))
+		fmt.Printf("#%v   %s   %s   %s\n", i, b.Metadata.CreatedAt, b.Metadata.GUID, formatStatus(b.Entity.Status))
 	}
 	return nil
 }

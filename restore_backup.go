@@ -11,8 +11,8 @@ import (
 
 // RestoreBackup is a service instance restore
 type RestoreBackup struct {
-	ServiceBrokerResponse
 	Restore
+	ServerResponseError
 }
 
 // RestoreBackup creates a backup for a service instance
@@ -22,25 +22,24 @@ func (p *AppCloudPlugin) RestoreBackup(c plugin.CliConnection, serviceInstanceNa
 		username = "you"
 	}
 
-	fmt.Printf("Creating a restore for the service backup for service instance %s as %s...\n", cyanBold(serviceInstanceName), cyanBold(username))
+	fmt.Printf("Restoring backup on the service instance %s as %s...\n", cyanBold(serviceInstanceName), cyanBold(username))
 
 	s, err := c.GetService(serviceInstanceName)
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve service instance %s", serviceInstanceName)
+		return fmt.Errorf("Service instance %s not found", serviceInstanceName)
 	}
 
 	url := fmt.Sprintf("/custom/service_instances/%s/backups/%s/restores", s.Guid, backupGUID)
-	fmt.Print(url)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "POST", url)
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve the restore %s for %s", backupGUID, serviceInstanceName)
+		return fmt.Errorf("Couldn't restore %s on %s", backupGUID, serviceInstanceName)
 	}
 
 	resString := strings.Join(resLines, "")
 	var bRes RestoreBackup
 	err = json.Unmarshal([]byte(resString), &bRes)
 	if err != nil {
-		return errors.New("Couldn't read JSON response")
+		return errors.New("Couldn't read JSON response from server")
 	}
 
 	if bRes.ErrorCode != "" {
@@ -49,6 +48,6 @@ func (p *AppCloudPlugin) RestoreBackup(c plugin.CliConnection, serviceInstanceNa
 
 	fmt.Print(greenBold("OK\n\n"))
 
-	fmt.Println("Restore in progress")
+	fmt.Printf("Restore in progress. Use '%s' to check operation status.\n", yellowBold("cf backups"))
 	return nil
 }

@@ -12,7 +12,7 @@ import (
 // ListSSLCertResponse is the response from the server when retrieved all certificates
 type ListSSLCertResponse struct {
 	SSLCertificates
-	ServerResponse
+	ServerResponseError
 }
 
 // ListSSLCertificates Lists available SSL certificates

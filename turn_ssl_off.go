@@ -12,7 +12,7 @@ import (
 // UnInstallSSLCertificate is the response from the server from a certificate uninstallation call
 type UnInstallSSLCertResponse struct {
 	SSLCertificate
-	ServerResponse
+	ServerResponseError
 }
 
 // TurnSSLOff uninstalls given SSL certificate

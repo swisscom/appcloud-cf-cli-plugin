@@ -11,8 +11,8 @@ import (
 
 // CreateBackupResponse is the response from the server from a create backup call
 type CreateBackupResponse struct {
-	ServiceBrokerResponse
 	Backup
+	ServerResponseError
 }
 
 // CreateBackup creates a backup for a service instance
@@ -26,20 +26,20 @@ func (p *AppCloudPlugin) CreateBackup(c plugin.CliConnection, serviceInstanceNam
 
 	s, err := c.GetService(serviceInstanceName)
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve service instance %s", serviceInstanceName)
+		return fmt.Errorf("Service instance %s not found", serviceInstanceName)
 	}
 
 	url := fmt.Sprintf("/custom/service_instances/%s/backups", s.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "POST", url)
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve backups for %s", serviceInstanceName)
+		return fmt.Errorf("Couldn't create backup for %s", serviceInstanceName)
 	}
 
 	resString := strings.Join(resLines, "")
 	var bRes CreateBackupResponse
 	err = json.Unmarshal([]byte(resString), &bRes)
 	if err != nil {
-		return errors.New("Couldn't read JSON response")
+		return errors.New("Couldn't read JSON response from server")
 	}
 
 	if bRes.ErrorCode != "" {
@@ -48,6 +48,6 @@ func (p *AppCloudPlugin) CreateBackup(c plugin.CliConnection, serviceInstanceNam
 
 	fmt.Print(greenBold("OK\n\n"))
 
-	fmt.Println("Backup in progress")
+	fmt.Printf("Create in progress. Use '%s' to check operation status.\n", yellowBold("cf backups"))
 	return nil
 }

@@ -11,8 +11,8 @@ import (
 
 // AbortSSLCertProcessResponse is the response from the server from a certificate aborting process call
 type AbortSSLCertProcessResponse struct {
+	ServerResponseError
 	SSLCertificate
-	ServerResponse
 }
 
 // AbortSSLCertificateProcess: A running certificate creation will be interrupted and aborted

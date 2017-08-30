@@ -11,7 +11,7 @@ import (
 
 // CreateBackupResponse is the response from the server from a create backup call
 type SendSpaceInvitationResponse struct {
-	ServerResponse
+	ServerResponseError
 	OrgInvitation
 }
 

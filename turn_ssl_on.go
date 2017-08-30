@@ -12,7 +12,7 @@ import (
 // InstallSSLCertResponse is the response from the server from a certificate installation call
 type InstallSSLCertResponse struct {
 	SSLCertificate
-	ServerResponse
+	ServerResponseError
 }
 
 // InstallSSLCertificate installs given SSL certificate

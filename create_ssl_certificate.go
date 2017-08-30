@@ -12,7 +12,7 @@ import (
 // CreateSSLCertResponse is the response from the server from a create certificate call
 type CreateSSLCertResponse struct {
 	SSLCertificate
-	ServerResponse
+	ServerResponseError
 }
 
 // CreateSSLCertificate creates a SSL certificate for provided route

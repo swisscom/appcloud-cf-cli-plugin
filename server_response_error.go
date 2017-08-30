@@ -1,7 +1,7 @@
 package main
 
-// ServiceBrokerResponse is the response from a service broker potentially containing errors
-type ServerResponse struct {
+// ServerResponseError is the response from a server which may contain an error
+type ServerResponseError struct {
 	Code        int    `json:"code"`
 	Description string `json:"description"`
 	ErrorCode   string `json:"error_code"`

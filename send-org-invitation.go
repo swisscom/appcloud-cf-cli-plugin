@@ -11,8 +11,8 @@ import (
 
 // CreateBackupResponse is the response from the server from a create backup call
 type SendInvitationResponse struct {
-	ServerResponse
 	OrgInvitation
+	ServerResponseError
 }
 
 // CreateBackup creates a backup for a service instance

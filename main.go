@@ -22,11 +22,13 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 			Build: 1,
 		},
 		Commands: []plugin.Command{
+
+			// Backups
 			{
-				Name:     "restore-backup",
-				HelpText: "Create a restore for a service backup for a service instance",
+				Name:     "backups",
+				HelpText: "List backups for a service instance",
 				UsageDetails: plugin.Usage{
-					Usage: "restore-backup SERVICE_INSTANCE BACKUP_GUID",
+					Usage: "backups SERVICE_INSTANCE",
 				},
 			},
 			{
@@ -37,130 +39,144 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				},
 			},
 			{
-				Name:     "backups",
-				HelpText: "List all backups for a service instance",
+				Name:     "restore-backup",
+				HelpText: "Restore a backup on a service instance",
 				UsageDetails: plugin.Usage{
-					Usage: "backups SERVICE_INSTANCE",
+					Usage: "restore-backup SERVICE_INSTANCE BACKUP_GUID",
+				},
+			},
+
+			// Invitations
+			{
+				Name:     "invitations",
+				HelpText: "List your currently pending invitations",
+				UsageDetails: plugin.Usage{
+					Usage: "invitations",
 				},
 			},
 			{
 				Name:     "invite-space-user",
 				HelpText: "Invite a user to a space",
 				UsageDetails: plugin.Usage{
-					Usage: "invite-space-user SPACE_NAME INVITEE ROLE1(,ROLE2(,ROLE3))",
+					Usage: "invite-space-user USERNAME ORG SPACE ROLE1[,ROLE2[,ROLE3]]",
 				},
 			},
 			{
 				Name:     "invite-org-user",
-				HelpText: "Invite a user to an organization",
+				HelpText: "Invite a user to an org",
 				UsageDetails: plugin.Usage{
-					Usage: "invite-org-user ORG_NAME INVITEE ROLE1(,ROLE2(,ROLE3))",
-				},
-			},
-			{
-				Name:     "create-ssl-certificate",
-				HelpText: "A new certificate will be issued and immediately installed",
-				UsageDetails: plugin.Usage{
-					Usage: "create-ssl-certificate ROUTE",
-				},
-			},
-			{
-				Name:     "turn-ssl-on",
-				HelpText: "Certificate will be disabled for given route",
-				UsageDetails: plugin.Usage{
-					Usage: "turn-ssl-on ROUTE",
-				},
-			},
-			{
-				Name:     "turn-ssl-off",
-				HelpText: "Certificate will be enabled for given route",
-				UsageDetails: plugin.Usage{
-					Usage: "turn-ssl-off ROUTE",
-				},
-			},
-			{
-				Name:     "revoke-ssl-certificate",
-				HelpText: "Certificate will be revoked",
-				UsageDetails: plugin.Usage{
-					Usage: "revoke-ssl-certificate ROUTE",
-				},
-			},
-			{
-				Name:     "abort-ssl-certificate",
-				HelpText: "Abort ssl certificate creation process",
-				UsageDetails: plugin.Usage{
-					Usage: "abort-ssl-certificate ROUTE",
-				},
-			},
-			{
-				Name:     "list-ssl-certificates",
-				HelpText: "List available certificates for space",
-				UsageDetails: plugin.Usage{
-					Usage: "list-ssl-certificates",
-				},
-			},
-			{
-				Name:     "tree",
-				HelpText: "View organization tree",
-				UsageDetails: plugin.Usage{
-					Usage: "tree [--level | -l]\n   tree \n   tree -l 2 \n   tree --level 1",
-					Options: map[string]string{
-						"--level, l": "Level of output",
-					},
-				},
-			},
-			{
-				Name:     "send-org-invitation",
-				HelpText: "Sending invitations to org/space",
-				UsageDetails: plugin.Usage{
-					Usage: "send-org-invitation ORG INVITEE ROLES",
-				},
-			},
-			{
-				Name:     "send-space-invitation",
-				HelpText: "Sending invitations to space",
-				UsageDetails: plugin.Usage{
-					Usage: "send-space-invitation SPACE INVITEE ROLES",
+					Usage: "invite-org-user USERNAME ORG ROLE1[,ROLE2]]",
 				},
 			},
 			{
 				Name:     "resend-org-invitation",
-				HelpText: "Resending invitations to org",
+				HelpText: "Resend an existing org invitation",
 				UsageDetails: plugin.Usage{
-					Usage: "resend-org-invitation ORG INVITEE ROLES",
+					Usage: "resend-org-invitation USERNAME ORG",
 				},
 			},
 			{
 				Name:     "resend-space-invitation",
-				HelpText: "Resending invitations to space",
+				HelpText: "Resend an existing space invitation",
 				UsageDetails: plugin.Usage{
-					Usage: "resend-org-invitation SPACE INVITEE ROLES",
+					Usage: "resend-org-invitation USERNAME ORG SPACE",
 				},
 			},
 			{
-				Name:     "invitation",
-				HelpText: "View invitations",
+				Name:     "accept-invitation",
+				HelpText: "Accept a pending invitation",
 				UsageDetails: plugin.Usage{
-					Usage: "invitation [--type | -t]\n   invitation\n   invitation -t account \n   invitation --type space",
+					Usage: "accept-invitation INVITATION_GUID",
+				},
+			},
+
+			// SSL certificates
+			{
+				Name:     "ssl-certificates",
+				HelpText: "List SSL certificates for the current space",
+				UsageDetails: plugin.Usage{
+					Usage: "list-ssl-certificates [--space SPACE]",
 					Options: map[string]string{
-						"--type, t": "Type of invitation",
+						"--space, s": "Space",
 					},
 				},
 			},
 			{
-				Name:     "invitation-accept",
-				HelpText: "Accept invitation",
+				Name:     "create-ssl-certificate",
+				HelpText: "Create and enable an SSL certificate for a route",
 				UsageDetails: plugin.Usage{
-					Usage: "invitation-accept TYPE GUID",
+					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Options: map[string]string{
+						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
+						"--path, p":     "Path for the HTTP route",
+					},
 				},
 			},
+			{
+				Name:     "revoke-ssl-certificate",
+				HelpText: "Revoke an existing SSL certificate for a route",
+				UsageDetails: plugin.Usage{
+					Usage: "revoke-ssl-certificate DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Options: map[string]string{
+						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
+						"--path, p":     "Path for the HTTP route",
+					},
+				},
+			},
+			{
+				Name:     "enable-ssl",
+				HelpText: "Enable an existing SSL certificate for a route",
+				UsageDetails: plugin.Usage{
+					Usage: "enable-ssl DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Options: map[string]string{
+						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
+						"--path, p":     "Path for the HTTP route",
+					},
+				},
+			},
+			{
+				Name:     "disable-ssl",
+				HelpText: "Disable an existing SSL certificate for a route",
+				UsageDetails: plugin.Usage{
+					Usage: "disable-ssl DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Options: map[string]string{
+						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
+						"--path, p":     "Path for the HTTP route",
+					},
+				},
+			},
+			{
+				Name:     "ssl-enabled",
+				HelpText: "Reports whether SSL is enabled for a route",
+				UsageDetails: plugin.Usage{
+					Usage: "ssl-enabled DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Options: map[string]string{
+						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
+						"--path, p":     "Path for the HTTP route",
+					},
+				},
+			},
+
+			// Docker registry
 			{
 				Name:     "docker-repositories",
 				HelpText: "List docker-repositories",
 				UsageDetails: plugin.Usage{
-					Usage: "docker-repositories [--org | -o]\n   docker-repositories\n   docker-repositories -o my-org \n   docker-repositories --org my-org",
+					Usage: "docker-repositories [--org ORG]",
 					Options: map[string]string{
-						"--type, t": "Type of invitation",
+						"--org, o": "Organization",
+					},
+				},
+			},
+
+			// Tree
+			{
+				Name:     "tree",
+				HelpText: "View organization tree",
+				UsageDetails: plugin.Usage{
+					Usage: "tree [--depth DEPTH]",
+					Options: map[string]string{
+						"--depth, d": "Depth of the tree output",
 					},
 				},
 			},
@@ -180,44 +196,57 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	var err error
 
 	switch args[0] {
-	case "restore-backup":
-		if len(args) < 3 {
-			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE and/or BACKUP_GUID was not provided")
-			return
-		}
 
-		err = p.RestoreBackup(cliConnection, args[1], args[2])
-	case "create-backup":
-		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
-			return
-		}
-
-		err = p.CreateBackup(cliConnection, args[1])
+	// Backups
 	case "backups":
-		if len(args) < 2 {
+		if len(args) != 2 {
 			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
 			return
 		}
 
 		err = p.Backups(cliConnection, args[1])
+	case "create-backup":
+		if len(args) != 2 {
+			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
+			return
+		}
+
+		err = p.CreateBackup(cliConnection, args[1])
+	case "restore-backup":
+		if len(args) != 3 {
+			fmt.Println("Incorrect Usage: the required arguments SERVICE_INSTANCE and/or BACKUP_GUID were not provided")
+			return
+		}
+
+		err = p.RestoreBackup(cliConnection, args[1], args[2])
+
+	// Invitations
 	case "invite-space-user":
-		if len(args) < 4 {
-			fmt.Println("Incorrect Usage: the required arguments SPACE_NAME, INVITEE and/or ROLES were not provided")
+		if len(args) != 4 {
+			fmt.Println("Incorrect Usage: the required arguments SPACE, INVITEE and/or ROLES were not provided")
 			return
 		}
 
 		err = p.InviteSpaceUser(cliConnection, args[1], args[2], args[3])
 	case "invite-org-user":
 		if len(args) < 4 {
-			fmt.Println("Incorrect Usage: the required arguments ORG_NAME, INVITEE and/or ROLES were not provided")
+			fmt.Println("Incorrect Usage: the required arguments ORG, INVITEE and/or ROLES were not provided")
 			return
 		}
 
 		err = p.InviteOrgUser(cliConnection, args[1], args[2], args[3])
+
+	// SSL Certificates
+	case "ssl-certificates":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			return
+		}
+
+		err = p.ListSSLCertificates(cliConnection)
 	case "create-ssl-certificate":
 		if len(args) < 3 {
-			fmt.Println("Incorrect Usage: the required arguments `DOMAIN`and `ROUTE` was not provided")
+			fmt.Println("Incorrect Usage: the required arguments DOMAIN and ROUTE was not provided")
 			return
 		}
 
@@ -249,13 +278,6 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		}
 
 		err = p.AbortSSLCertificateProcess(cliConnection, args[1])
-	case "list-ssl-certificates":
-		if len(args) < 1 {
-			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
-			return
-		}
-
-		err = p.ListSSLCertificates(cliConnection)
 	case "send-org-invitation":
 		if len(args) < 4 {
 			fmt.Println("Incorrect Usage: the required arguments was not provided")
@@ -336,7 +358,8 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	}
 
 	if err != nil {
-		fmt.Printf("\n%s\n", redBold(err.Error()))
+		fmt.Print(redBold("FAILED\n\n"))
+		fmt.Println(err.Error())
 	}
 }
 
