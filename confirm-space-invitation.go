@@ -34,7 +34,7 @@ func (p *AppCloudPlugin) SendSpaceInvitation(c plugin.CliConnection, spaceName s
 	}
 
 	resString := strings.Join(resLines, "")
-	var bRes SendInvitationResponse
+	var bRes InvitationResponse
 	err = json.Unmarshal([]byte(resString), &bRes)
 	if err != nil {
 		return errors.New("Couldn't read JSON response")

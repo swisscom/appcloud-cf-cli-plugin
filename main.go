@@ -9,10 +9,10 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// AppCloudPlugin is the Swisscom Application Cloud cf CLI plugin
+// AppCloudPlugin is the Swisscom Application Cloud cf CLI plugin.
 type AppCloudPlugin struct{}
 
-// GetMetadata retrieves the metadata for the plugin
+// GetMetadata retrieves the metadata for the plugin.
 func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
 		Name: "Swisscom Application Cloud",
@@ -46,19 +46,35 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				},
 			},
 
-			// Invitations
+			// Receive Invitations
 			{
 				Name:     "invitations",
-				HelpText: "List your currently pending invitations",
+				HelpText: "List your pending invitations",
 				UsageDetails: plugin.Usage{
 					Usage: "invitations",
 				},
 			},
 			{
-				Name:     "invite-space-user",
-				HelpText: "Invite a user to a space",
+				Name:     "accept-invitation",
+				HelpText: "Accept a pending invitation",
 				UsageDetails: plugin.Usage{
-					Usage: "invite-space-user USERNAME ORG SPACE ROLE1[,ROLE2[,ROLE3]]",
+					Usage: "accept-invitation INVITATION_GUID",
+				},
+			},
+			{
+				Name:     "decline-invitation",
+				HelpText: "Decline a pending invitation",
+				UsageDetails: plugin.Usage{
+					Usage: "decline-invitation INVITATION_GUID",
+				},
+			},
+
+			// Send invitations
+			{
+				Name:     "invite-billing-account-user",
+				HelpText: "Invite a user to a billing account as an 'accountOwner'",
+				UsageDetails: plugin.Usage{
+					Usage: "invite-org-user USERNAME BILLING_ACCOUNT",
 				},
 			},
 			{
@@ -66,6 +82,20 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				HelpText: "Invite a user to an org",
 				UsageDetails: plugin.Usage{
 					Usage: "invite-org-user USERNAME ORG ROLE1[,ROLE2]]",
+				},
+			},
+			{
+				Name:     "invite-space-user",
+				HelpText: "Invite a user to a space",
+				UsageDetails: plugin.Usage{
+					Usage: "invite-space-user USERNAME SPACE ROLE1[,ROLE2[,ROLE3]]",
+				},
+			},
+			{
+				Name:     "resend-billing-account-invitation",
+				HelpText: "Resend an existing billing account invitation",
+				UsageDetails: plugin.Usage{
+					Usage: "resend-org-invitation USERNAME BILLING_ACCOUNT",
 				},
 			},
 			{
@@ -79,14 +109,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "resend-space-invitation",
 				HelpText: "Resend an existing space invitation",
 				UsageDetails: plugin.Usage{
-					Usage: "resend-org-invitation USERNAME ORG SPACE",
-				},
-			},
-			{
-				Name:     "accept-invitation",
-				HelpText: "Accept a pending invitation",
-				UsageDetails: plugin.Usage{
-					Usage: "accept-invitation INVITATION_GUID",
+					Usage: "resend-org-invitation USERNAME SPACE",
 				},
 			},
 
@@ -191,7 +214,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 	}
 }
 
-// Run initiates the plugin
+// Run initiates the plugin.
 func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) {
 	var err error
 
@@ -220,21 +243,64 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 
 		err = p.RestoreBackup(cliConnection, args[1], args[2])
 
-	// Invitations
-	case "invite-space-user":
-		if len(args) != 4 {
-			fmt.Println("Incorrect Usage: the required arguments SPACE, INVITEE and/or ROLES were not provided")
+	// Receive Invitations
+	case "invitations":
+		err = p.Invitations(cliConnection)
+	case "accept-invitation":
+		if len(args) != 2 {
+			fmt.Println("Incorrect Usage: the required argument INVITATION_GUID was not provided")
 			return
 		}
 
-		err = p.InviteSpaceUser(cliConnection, args[1], args[2], args[3])
+		err = p.AcceptInvitation(cliConnection, args[1])
+	case "decline-invitation":
+		if len(args) != 2 {
+			fmt.Println("Incorrect Usage: the required argument INVITATION_GUID was not provided")
+			return
+		}
+
+		err = p.DeclineInvitation(cliConnection, args[1])
+
+	// Send invitations
+	case "invite-billing-account-user":
+		if len(args) != 3 {
+			fmt.Println("Incorrect Usage: the required arguments USERNAME and/or BILLING_ACCOUNT were not provided")
+			return
+		}
+
+		err = p.InviteBillingAccountUser(cliConnection, args[1], args[2])
 	case "invite-org-user":
-		if len(args) < 4 {
-			fmt.Println("Incorrect Usage: the required arguments ORG, INVITEE and/or ROLES were not provided")
+		if len(args) != 4 {
+			fmt.Println("Incorrect Usage: the required arguments USERNAME, ORG and/or ROLES were not provided")
 			return
 		}
 
 		err = p.InviteOrgUser(cliConnection, args[1], args[2], args[3])
+	case "invite-space-user":
+		if len(args) != 4 {
+			fmt.Println("Incorrect Usage: the required arguments USERNAME, SPACE and/or ROLES were not provided")
+			return
+		}
+
+		err = p.InviteSpaceUser(cliConnection, args[1], args[2], args[3])
+	case "resend-billing-account-invitation":
+		if len(args) != 3 {
+			fmt.Println("Incorrect Usage: the required arguments USERNAME and/org BILLING_ACCOUNT were not provided")
+			return
+		}
+		err = p.ResendBillingAccountInvitation(cliConnection, args[1], args[2])
+	case "resend-org-invitation":
+		if len(args) != 3 {
+			fmt.Println("Incorrect Usage: the required arguments USERNAME and/org ORG were not provided")
+			return
+		}
+		err = p.ResendOrgInvitation(cliConnection, args[1], args[2])
+	case "resend-space-invitation":
+		if len(args) != 3 {
+			fmt.Println("Incorrect Usage: the required arguments USERNAME and/or SPACE were not provided")
+			return
+		}
+		err = p.ResendSpaceInvitation(cliConnection, args[1], args[2])
 
 	// SSL Certificates
 	case "ssl-certificates":
@@ -278,24 +344,6 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		}
 
 		err = p.AbortSSLCertificateProcess(cliConnection, args[1])
-	case "send-org-invitation":
-		if len(args) < 4 {
-			fmt.Println("Incorrect Usage: the required arguments was not provided")
-			return
-		}
-		err = p.SendOrgInvitation(cliConnection, args[1], args[2], args[3])
-	case "resend-org-invitation":
-		if len(args) < 4 {
-			fmt.Println("Incorrect Usage: the required arguments was not provided")
-			return
-		}
-		err = p.ResendOrgInvitation(cliConnection, args[1], args[2], args[3])
-	case "resend-space-invitation":
-		if len(args) < 4 {
-			fmt.Println("Incorrect Usage: the required arguments was not provided")
-			return
-		}
-		err = p.ResendSpaceInvitation(cliConnection, args[1], args[2], args[3])
 
 	case "tree":
 		fc, err := parseArguments(args)
@@ -306,39 +354,6 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		value := fc.Int("l")
 
 		err = p.Tree(cliConnection, value)
-	case "invitation":
-		fc, err := parseArguments(args)
-		if err != nil {
-			fmt.Println("Incorrect Usage: Type option must be a string")
-			return
-		}
-		value := strings.ToLower(fc.String("t"))
-
-		valid := map[string]bool{"account": true, "organization": true, "space": true, "all": true}
-
-		if !valid[value] {
-			fmt.Println("Incorrect Usage: If type option is used, it must be account, organization, or space")
-			return
-		}
-
-		err = p.Invitations(cliConnection, value)
-
-	case "invitation-accept":
-		if len(args) < 3 {
-			fmt.Println("Incorrect Usage: the required argument GUID and/or TYPE was not provided")
-			return
-		}
-
-		value := strings.ToLower(args[1])
-
-		valid := map[string]bool{"account": true, "organization": true, "space": true}
-
-		if !valid[value] {
-			fmt.Println("Incorrect Usage: Invitation type is must be account, organization, or space")
-			return
-		}
-
-		err = p.AcceptInvitation(cliConnection, args[1], args[2])
 	case "docker-repositories":
 		fc, err := parseArguments(args)
 		if err != nil {

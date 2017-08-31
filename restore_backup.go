@@ -9,13 +9,13 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// RestoreBackup is a service instance restore
-type RestoreBackup struct {
+// RestoreBackup is a service instance restore.
+type RestoreBackupResponse struct {
 	Restore
 	ServerResponseError
 }
 
-// RestoreBackup creates a backup for a service instance
+// RestoreBackup creates a backup for a service instance.
 func (p *AppCloudPlugin) RestoreBackup(c plugin.CliConnection, serviceInstanceName string, backupGUID string) error {
 	username, err := c.Username()
 	if err != nil {
@@ -36,14 +36,14 @@ func (p *AppCloudPlugin) RestoreBackup(c plugin.CliConnection, serviceInstanceNa
 	}
 
 	resString := strings.Join(resLines, "")
-	var bRes RestoreBackup
-	err = json.Unmarshal([]byte(resString), &bRes)
+	var res RestoreBackupResponse
+	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
 		return errors.New("Couldn't read JSON response from server")
 	}
 
-	if bRes.ErrorCode != "" {
-		return errors.New(bRes.Description)
+	if res.ErrorCode != "" {
+		return errors.New(res.Description)
 	}
 
 	fmt.Print(greenBold("OK\n\n"))

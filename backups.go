@@ -9,17 +9,14 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// BackupsResponse is the response of the server to a get backups call
+// BackupsResponse is the response of the server to a get backups call.
 type BackupsResponse struct {
-	TotalResult int      `json:"total_results"`
-	TotalPages  int      `json:"total_pages"`
-	PrevURL     string   `json:"prev_url"`
-	NextURL     string   `json:"next_url"`
-	Resources   []Backup `json:"resources"`
+	Resources []Backup `json:"resources"`
+	ServerResponsePagination
 	ServerResponseError
 }
 
-// Backups lists all backups for a service instance
+// Backups lists all backups for a service instance.
 func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName string) error {
 	username, err := c.Username()
 	if err != nil {
@@ -40,19 +37,19 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 	}
 
 	resString := strings.Join(resLines, "")
-	var bRes BackupsResponse
-	err = json.Unmarshal([]byte(resString), &bRes)
+	var res BackupsResponse
+	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
 		return errors.New("Couldn't read JSON response from server")
 	}
 
-	if bRes.ErrorCode != "" {
-		return errors.New(bRes.Description)
+	if res.ErrorCode != "" {
+		return errors.New(res.Description)
 	}
 
 	fmt.Print(greenBold("OK\n\n"))
 
-	backups := bRes.Resources
+	backups := res.Resources
 	if len(backups) == 0 {
 		fmt.Println("No backups found")
 		return nil
@@ -65,7 +62,7 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 	return nil
 }
 
-// formatStatus formats a status more nicely
+// formatStatus formats a status more nicely.
 func formatStatus(s string) string {
 	formatted := strings.Replace(s, "_", " ", -1)
 	formatted = strings.ToLower(formatted)

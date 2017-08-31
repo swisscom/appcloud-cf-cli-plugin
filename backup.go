@@ -1,6 +1,6 @@
 package main
 
-// Backup is a service instance backup
+// Backup is a service instance backup.
 type Backup struct {
 	Metadata struct {
 		GUID      string `json:"guid"`

@@ -9,13 +9,13 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// CreateBackupResponse is the response from the server from a create backup call
+// CreateBackupResponse is the response from the server from a create backup call.
 type CreateBackupResponse struct {
 	Backup
 	ServerResponseError
 }
 
-// CreateBackup creates a backup for a service instance
+// CreateBackup creates a backup for a service instance.
 func (p *AppCloudPlugin) CreateBackup(c plugin.CliConnection, serviceInstanceName string) error {
 	username, err := c.Username()
 	if err != nil {
@@ -36,14 +36,14 @@ func (p *AppCloudPlugin) CreateBackup(c plugin.CliConnection, serviceInstanceNam
 	}
 
 	resString := strings.Join(resLines, "")
-	var bRes CreateBackupResponse
-	err = json.Unmarshal([]byte(resString), &bRes)
+	var res CreateBackupResponse
+	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
 		return errors.New("Couldn't read JSON response from server")
 	}
 
-	if bRes.ErrorCode != "" {
-		return errors.New(bRes.Description)
+	if res.ErrorCode != "" {
+		return errors.New(res.Description)
 	}
 
 	fmt.Print(greenBold("OK\n\n"))
