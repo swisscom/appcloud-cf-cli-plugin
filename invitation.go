@@ -1,5 +1,14 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+
+	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/plugin"
+)
+
 // Invitation is an invitation a user received to join a specific entity.
 type Invitation struct {
 	Metadata struct {
@@ -21,4 +30,72 @@ type Invitation struct {
 		SpaceName        string   `json:"space_name"`
 		Status           string   `json:"status"`
 	} `json:"entity"`
+}
+
+// InvitationResponse is a response from the server to an invitation request.
+type InvitationResponse struct {
+	Invitation
+	ServerResponseError
+}
+
+// InvitationsResponse is a response from the server containing invitations.
+type InvitationsResponse struct {
+	Resources []Invitation `json:"resources"`
+	ServerResponsePagination
+	ServerResponseError
+}
+
+// invitationEntityTypeAndName returns the entity type and its name for an invitation.
+func invitationEntityTypeAndName(inv Invitation) (string, string) {
+	var entityType string
+	var entityName string
+	if inv.Entity.AccountID != "" {
+		entityType = "Billing Account"
+		entityName = inv.Entity.AccountName
+	}
+	if inv.Entity.OrganizationID != "" {
+		entityType = "Org            "
+		entityName = inv.Entity.OrganizationName
+	}
+	if inv.Entity.SpaceID != "" {
+		entityType = "Space          "
+		entityName = fmt.Sprintf("%s / %s", inv.Entity.OrganizationName, inv.Entity.SpaceName)
+	}
+
+	return entityType, entityName
+}
+
+// getAllInvitations retrieves the invitations for an entity type.
+func getAllInvitations(c plugin.CliConnection) ([]Invitation, error) {
+	entityTypes := []string{
+		"account",
+		"organization",
+		"space",
+	}
+
+	var invitations []Invitation
+	for _, t := range entityTypes {
+		url := fmt.Sprintf("/custom/%s_invitations", t)
+		resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
+		if err != nil {
+			return []Invitation{}, fmt.Errorf("Couldn't retrieve %s invitations", t)
+		}
+
+		resString := strings.Join(resLines, "")
+		var res InvitationsResponse
+		err = json.Unmarshal([]byte(resString), &res)
+		if err != nil {
+			return []Invitation{}, errors.New("Couldn't read JSON response from server")
+		}
+
+		if res.ErrorCode != "" {
+			return []Invitation{}, errors.New(res.Description)
+		}
+
+		for _, i := range res.Resources {
+			invitations = append(invitations, i)
+		}
+	}
+
+	return invitations, nil
 }

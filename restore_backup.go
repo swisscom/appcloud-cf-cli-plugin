@@ -9,12 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// RestoreBackup is a service instance restore.
-type RestoreBackupResponse struct {
-	Restore
-	ServerResponseError
-}
-
 // RestoreBackup creates a backup for a service instance.
 func (p *AppCloudPlugin) RestoreBackup(c plugin.CliConnection, serviceInstanceName string, backupGUID string) error {
 	username, err := c.Username()

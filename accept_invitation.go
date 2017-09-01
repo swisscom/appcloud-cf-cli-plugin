@@ -35,7 +35,7 @@ func (p *AppCloudPlugin) AcceptInvitation(c plugin.CliConnection, invitationGUID
 		return errors.New("Invitation not found")
 	}
 
-	t, _ := entityTypeAndName(inv)
+	t, _ := invitationEntityTypeAndName(inv)
 	url := fmt.Sprintf("/custom/%s_invitations/%s/confirm", t, inv.Metadata.GUID)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "POST", url)
 	if err != nil {

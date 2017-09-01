@@ -9,17 +9,11 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// BillingAccountInvitationArgs are the arguments required by the server to invite a user to a billing account.
-type BillingAccountInvitationArgs struct {
+// InviteBillingAccountUserRequest is the request to invite a user to a billing account.
+type InviteBillingAccountUserRequest struct {
 	Invitee   string   `json:"invitee"`
 	AccountID string   `json:"account_id"`
 	Roles     []string `json:"roles"`
-}
-
-// InvitationResponse is a response from the server to an invitation request.
-type InvitationResponse struct {
-	Invitation
-	ServerResponseError
 }
 
 // InviteBillingAccountUser invites a user to join a billing account with a specific set of roles.
@@ -36,7 +30,7 @@ func (p *AppCloudPlugin) InviteBillingAccountUser(c plugin.CliConnection, billin
 		return fmt.Errorf("Billing Account %s not found", billingAccountName)
 	}
 
-	args := BillingAccountInvitationArgs{
+	args := InviteBillingAccountUserRequest{
 		Invitee:   invitee,
 		AccountID: ba.Metadata.GUID,
 		Roles:     []string{"accountOwner"},

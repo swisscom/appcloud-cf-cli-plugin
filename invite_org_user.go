@@ -9,8 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// OrgInvitationArgs are the arguments required by the server to invite a user to an org.
-type OrgInvitationArgs struct {
+// InviteOrgUserRequest is a request to invite a user to an org.
+type InviteOrgUserRequest struct {
 	Invitee string   `json:"invitee"`
 	OrgID   string   `json:"organization_id"`
 	Roles   []string `json:"roles"`
@@ -30,7 +30,7 @@ func (p *AppCloudPlugin) InviteOrgUser(c plugin.CliConnection, orgName string, i
 		return fmt.Errorf("Org %s not found", orgName)
 	}
 
-	args := OrgInvitationArgs{
+	args := InviteOrgUserRequest{
 		Invitee: invitee,
 		OrgID:   o.Guid,
 		Roles:   strings.Split(roles, ","),

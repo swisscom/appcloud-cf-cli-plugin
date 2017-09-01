@@ -9,13 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// BackupsResponse is the response of the server to a get backups call.
-type BackupsResponse struct {
-	Resources []Backup `json:"resources"`
-	ServerResponsePagination
-	ServerResponseError
-}
-
 // Backups lists all backups for a service instance.
 func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName string) error {
 	username, err := c.Username()
@@ -64,6 +57,10 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 
 // formatStatus formats a status more nicely.
 func formatStatus(s string) string {
+	if s == "VALID_INST" {
+		s = "INSTALLED"
+	}
+
 	formatted := strings.Replace(s, "_", " ", -1)
 	formatted = strings.ToLower(formatted)
 

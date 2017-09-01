@@ -9,8 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// SpaceInvitationArgs are the arguments required by the server to invite a user to a space.
-type SpaceInvitationArgs struct {
+// InviteSpaceUserRequest is a request to invite a user to a space.
+type InviteSpaceUserRequest struct {
 	Invitee string   `json:"invitee"`
 	SpaceID string   `json:"space_id"`
 	Roles   []string `json:"roles"`
@@ -30,14 +30,14 @@ func (p *AppCloudPlugin) InviteSpaceUser(c plugin.CliConnection, spaceName strin
 		return fmt.Errorf("Space %s not found", spaceName)
 	}
 
-	args := SpaceInvitationArgs{
+	args := InviteSpaceUserRequest{
 		Invitee: invitee,
 		SpaceID: s.Guid,
 		Roles:   strings.Split(roles, ","),
 	}
 	argsData, err := json.Marshal(args)
 	if err != nil {
-		return fmt.Errorf("Couldn't parse JSON data")
+		return errors.New("Couldn't parse JSON data")
 	}
 
 	url := "/custom/space_invitations"

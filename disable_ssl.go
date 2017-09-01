@@ -9,8 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// RevokeSSLCertificate revokes an existing SSL certificate.
-func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, domain string, hostname string) error {
+// DisableSSL uninstalls an existing SSL certificate.
+func (p *AppCloudPlugin) DisableSSL(c plugin.CliConnection, domain string, hostname string) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
@@ -21,7 +21,7 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, domain str
 		fullDomain = strings.Join([]string{hostname, domain}, ".")
 	}
 
-	fmt.Printf("Revoking SSL certificate for %s as %s...\n", cyanBold(fullDomain), cyanBold(username))
+	fmt.Printf("Disabling SSL for %s as %s...\n", cyanBold(fullDomain), cyanBold(username))
 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
@@ -36,11 +36,11 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, domain str
 	if err != nil {
 		return errors.New("Couldn't parse JSON data")
 	}
+	url := "/custom/certifications/uninstall"
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", url, "-d", string(reqData))
 
-	url := "/custom/certifications/revoke"
-	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "DELETE", url, "-d", string(reqData))
 	if err != nil {
-		return fmt.Errorf("Couldn't revoke SSL certificate for %s", fullDomain)
+		return fmt.Errorf("Couldn't disable SSL for %s", fullDomain)
 	}
 
 	resString := strings.Join(resLines, "")
@@ -56,6 +56,6 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, domain str
 
 	fmt.Print(greenBold("OK\n\n"))
 
-	fmt.Println("SSL certificate revoked")
+	fmt.Println("SSL disabled")
 	return nil
 }

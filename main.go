@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 
-	"strings"
-
 	"code.cloudfoundry.org/cli/cf/flags"
 	"code.cloudfoundry.org/cli/plugin"
 )
@@ -43,6 +41,13 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				HelpText: "Restore a backup on a service instance",
 				UsageDetails: plugin.Usage{
 					Usage: "restore-backup SERVICE_INSTANCE BACKUP_GUID",
+				},
+			},
+			{
+				Name:     "delete-backup",
+				HelpText: "Delete a backup of a service instance",
+				UsageDetails: plugin.Usage{
+					Usage: "delete-backup SERVICE_INSTANCE BACKUP_GUID",
 				},
 			},
 
@@ -118,20 +123,16 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "ssl-certificates",
 				HelpText: "List SSL certificates for the current space",
 				UsageDetails: plugin.Usage{
-					Usage: "list-ssl-certificates [--space SPACE]",
-					Options: map[string]string{
-						"--space, s": "Space",
-					},
+					Usage: "ssl-certificates",
 				},
 			},
 			{
 				Name:     "create-ssl-certificate",
 				HelpText: "Create and enable an SSL certificate for a route",
 				UsageDetails: plugin.Usage{
-					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
-						"--path, p":     "Path for the HTTP route",
+						"--hostname, n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -139,10 +140,9 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "revoke-ssl-certificate",
 				HelpText: "Revoke an existing SSL certificate for a route",
 				UsageDetails: plugin.Usage{
-					Usage: "revoke-ssl-certificate DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Usage: "revoke-ssl-certificate DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
-						"--path, p":     "Path for the HTTP route",
+						"--hostname, n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -150,10 +150,9 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "enable-ssl",
 				HelpText: "Enable an existing SSL certificate for a route",
 				UsageDetails: plugin.Usage{
-					Usage: "enable-ssl DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Usage: "enable-ssl DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
-						"--path, p":     "Path for the HTTP route",
+						"--hostname, n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -161,10 +160,9 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "disable-ssl",
 				HelpText: "Disable an existing SSL certificate for a route",
 				UsageDetails: plugin.Usage{
-					Usage: "disable-ssl DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Usage: "disable-ssl DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
-						"--path, p":     "Path for the HTTP route",
+						"--hostname, n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -172,22 +170,9 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "ssl-enabled",
 				HelpText: "Reports whether SSL is enabled for a route",
 				UsageDetails: plugin.Usage{
-					Usage: "ssl-enabled DOMAIN [--hostname HOSTNAME] [--path PATH]",
+					Usage: "ssl-enabled DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route (required for shared domains)",
-						"--path, p":     "Path for the HTTP route",
-					},
-				},
-			},
-
-			// Docker registry
-			{
-				Name:     "docker-repositories",
-				HelpText: "List docker-repositories",
-				UsageDetails: plugin.Usage{
-					Usage: "docker-repositories [--org ORG]",
-					Options: map[string]string{
-						"--org, o": "Organization",
+						"--hostname, n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -199,15 +184,17 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "tree [--depth DEPTH]",
 					Options: map[string]string{
-						"--depth, d": "Depth of the tree output",
+						"--depth, d": "Depth of the tree output (0: orgs, 1: spaces, 2: apps and service instances)",
 					},
 				},
 			},
+
+			// Service events
 			{
 				Name:     "service-events",
-				HelpText: "Show service events for SERVICE_INSTANCE",
+				HelpText: "Show recent service instance events",
 				UsageDetails: plugin.Usage{
-					Usage: "service-events  SERVICE_INSTANCE",
+					Usage: "service-events SERVICE_INSTANCE",
 				},
 			},
 		},
@@ -242,6 +229,13 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		}
 
 		err = p.RestoreBackup(cliConnection, args[1], args[2])
+	case "delete-backup":
+		if len(args) != 3 {
+			fmt.Println("Incorrect Usage: the required arguments SERVICE_INSTANCE and/or BACKUP_GUID were not provided")
+			return
+		}
+
+		err = p.DeleteBackup(cliConnection, args[1], args[2])
 
 	// Receive Invitations
 	case "invitations":
@@ -304,68 +298,87 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 
 	// SSL Certificates
 	case "ssl-certificates":
+		err = p.SSLCertificates(cliConnection)
+	case "create-ssl-certificate":
 		if len(args) < 2 {
 			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
 			return
 		}
 
-		err = p.ListSSLCertificates(cliConnection)
-	case "create-ssl-certificate":
-		if len(args) < 3 {
-			fmt.Println("Incorrect Usage: the required arguments DOMAIN and ROUTE was not provided")
-			return
-		}
-
-		err = p.CreateSSLCertificate(cliConnection, args[2])
-	case "turn-ssl-on":
-		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
-			return
-		}
-
-		err = p.TurnSSLOn(cliConnection, args[1])
-	case "turn-ssl-off":
-		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
-			return
-		}
-		err = p.TurnSSLOff(cliConnection, args[1])
-	case "revoke-ssl-certificate":
-		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
-			return
-		}
-
-		err = p.RevokeSSLCertificate(cliConnection, args[1])
-	case "abort-ssl-certificate":
-		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument ROUTE was not provided")
-			return
-		}
-
-		err = p.AbortSSLCertificateProcess(cliConnection, args[1])
-
-	case "tree":
-		fc, err := parseArguments(args)
-		if err != nil {
-			fmt.Println("Incorrect Usage: Level option must be an int")
-			return
-		}
-		value := fc.Int("l")
-
-		err = p.Tree(cliConnection, value)
-	case "docker-repositories":
-		fc, err := parseArguments(args)
+		fc, err := parseSSLCertificateArgs(args)
 		if err != nil {
 			fmt.Println("Incorrect Usage: Organization option must be a string")
 			return
 		}
-		value := strings.ToLower(fc.String("o"))
 
-		err = p.DockerRepository(cliConnection, value)
+		err = p.CreateSSLCertificate(cliConnection, args[2], fc.String("n"))
+	case "revoke-ssl-certificate":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			return
+		}
+
+		fc, err := parseSSLCertificateArgs(args)
+		if err != nil {
+			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
+			return
+		}
+
+		err = p.RevokeSSLCertificate(cliConnection, args[1], fc.String("n"))
+	case "enable-ssl":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			return
+		}
+
+		fc, err := parseSSLCertificateArgs(args)
+		if err != nil {
+			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
+			return
+		}
+
+		err = p.EnableSSL(cliConnection, args[1], fc.String("n"))
+	case "disable-ssl":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			return
+		}
+
+		fc, err := parseSSLCertificateArgs(args)
+		if err != nil {
+			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
+			return
+		}
+
+		err = p.DisableSSL(cliConnection, args[1], fc.String("n"))
+	case "ssl-enabled":
+		if len(args) < 2 {
+			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			return
+		}
+
+		fc, err := parseSSLCertificateArgs(args)
+		if err != nil {
+			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
+			return
+		}
+
+		err = p.SSLEnabled(cliConnection, args[1], fc.String("n"))
+
+	// Tree
+	case "tree":
+		fc, err := parseTreeArgs(args)
+		if err != nil {
+			fmt.Println("Incorrect Usage: DEPTH must be an integer")
+			return
+		}
+
+		err = p.Tree(cliConnection, fc.Int("d"))
+
+	// Service events
 	case "service-events":
 		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required arguments was not provided")
+			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
 			return
 		}
 
@@ -378,11 +391,22 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	}
 }
 
-func parseArguments(args []string) (flags.FlagContext, error) {
+// parseSSLCertificateArgs parses the arguments passed to a ssl certificate command.
+func parseSSLCertificateArgs(args []string) (flags.FlagContext, error) {
 	fc := flags.New()
-	fc.NewIntFlagWithDefault("level", "l", "Level of output", 3)
-	fc.NewStringFlagWithDefault("type", "t", "Type of invitation", "all")
-	fc.NewStringFlagWithDefault("org", "o", "Organization", "none")
+	fc.NewStringFlag("hostname", "n", "Hostname for the HTTP route")
+	err := fc.Parse(args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return fc, nil
+}
+
+// parseTreeArgs parses the arguments passed to a tree command.
+func parseTreeArgs(args []string) (flags.FlagContext, error) {
+	fc := flags.New()
+	fc.NewIntFlagWithDefault("depth", "d", "Level of output", 2)
 	err := fc.Parse(args...)
 
 	return fc, err

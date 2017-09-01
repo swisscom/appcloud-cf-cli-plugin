@@ -9,41 +9,54 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-// CreateSSLCertResponse is the response from the server from a create certificate call
-type CreateSSLCertResponse struct {
-	SSLCertificate
-	ServerResponseError
-}
+// CreateSSLCertificate creates a new SSL certificate for an FQDN.
+func (p *AppCloudPlugin) CreateSSLCertificate(c plugin.CliConnection, domain string, hostname string) error {
+	username, err := c.Username()
+	if err != nil {
+		username = "you"
+	}
 
-// CreateSSLCertificate creates a SSL certificate for provided route
-func (p *AppCloudPlugin) CreateSSLCertificate(c plugin.CliConnection, fullDomain string) error {
-	fmt.Printf("Creating SSL certificate for route %s ...\n", cyanBold(fullDomain))
-	fmt.Print(greenBold("OK\n\n"))
-	// Get the current targeted space details
+	fullDomain := domain
+	if hostname != "" {
+		fullDomain = strings.Join([]string{hostname, domain}, ".")
+	}
+
+	fmt.Printf("Creating SSL certificate for %s as %s...\n", cyanBold(fullDomain), cyanBold(username))
+
 	s, err := c.GetCurrentSpace()
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve space")
+		return fmt.Errorf("Couldn't retrieve current space")
 	}
-	req := fmt.Sprintf("'{\"space_id\": \"%s\",\"full_domain_name\": \"%s\"}'", s.Guid, fullDomain)
+
+	req := SSLCertificateRequest{
+		SpaceID:        s.Guid,
+		FullDomainName: fullDomain,
+	}
+	reqData, err := json.Marshal(req)
+	if err != nil {
+		return errors.New("Couldn't parse JSON data")
+	}
 
 	url := "/custom/certifications/create"
-	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", "-d", req, url)
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", url, "-d", string(reqData))
 
 	if err != nil {
-		return fmt.Errorf("Couldn't create SSL certificate for domain:  %s", fullDomain)
+		return fmt.Errorf("Couldn't create SSL certificate for %s", fullDomain)
 	}
 
 	resString := strings.Join(resLines, "")
-	var bRes CreateSSLCertResponse
-	err = json.Unmarshal([]byte(resString), &bRes)
+	var res SSLCertificateResponse
+	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response")
+		return errors.New("Couldn't read JSON response from server")
 	}
 
-	if bRes.ErrorCode != "" {
-		return errors.New(bRes.Description)
+	if res.ErrorCode != "" {
+		return errors.New(res.Description)
 	}
 
-	fmt.Println("SSL certificate creation suceeded")
+	fmt.Print(greenBold("OK\n\n"))
+
+	fmt.Println("SSL certificate created")
 	return nil
 }

@@ -1,5 +1,11 @@
 package main
 
+// RestoreBackupResponse is a response from the server to a restore backup call.
+type RestoreBackupResponse struct {
+	Restore
+	ServerResponseError
+}
+
 // Restore is a service instance restore
 type Restore struct {
 	Metadata struct {

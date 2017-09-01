@@ -2,14 +2,22 @@ package main
 
 // Backup is a service instance backup.
 type Backup struct {
-	Metadata struct {
-		GUID      string `json:"guid"`
-		URL       string `json:"url"`
-		CreatedAt string `json:"created_at"`
-		UpdatedAt string `json:"updated_at"`
-	} `json:"metadata"`
-	Entity struct {
+	Metadata CFMetadata `json:"metadata"`
+	Entity   struct {
 		ServiceInstanceID string `json:"service_instance_id"`
 		Status            string `json:"status"`
 	} `json:"entity"`
+}
+
+// BackupResponse is the response from the server from a create backup call.
+type BackupResponse struct {
+	Backup
+	ServerResponseError
+}
+
+// BackupsResponse is the response of the server to a get backups call.
+type BackupsResponse struct {
+	Resources []Backup `json:"resources"`
+	ServerResponsePagination
+	ServerResponseError
 }

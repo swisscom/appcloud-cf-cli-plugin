@@ -9,108 +9,181 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-func (p *AppCloudPlugin) Tree(c plugin.CliConnection, level int) error {
+// TreeResponse is the response of a server to a tree request.
+type TreeResponse struct {
+	Resources []TreeOrg `json:"resources"`
+	ServerResponsePagination
+	ServerResponseError
+}
+
+// TreeOrg is an org node of the tree structure.
+type TreeOrg struct {
+	ID     string      `json:"id"`
+	Name   string      `json:"name"`
+	Status string      `json:"status"`
+	Spaces []TreeSpace `json:"spaces"`
+}
+
+// TreeSpace is a space node of the tree structure.
+type TreeSpace struct {
+	ID               string        `json:"id"`
+	Name             string        `json:"name"`
+	Applications     []TreeApp     `json:"applications"`
+	ServiceInstances []TreeService `json:"service_instances"`
+}
+
+// TreeApp is an app node of the tree structure.
+type TreeApp struct {
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	BackupIconUrl string `json:"buildpack_icon_url"`
+}
+
+// TreeService is a service instance node of the tree structure.
+type TreeService struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	ServiceIconUrl string `json:"service_icon_url"`
+}
+
+// Tree renders the org tree for the current user.
+func (p *AppCloudPlugin) Tree(c plugin.CliConnection, depth int) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
 	}
 
-	fmt.Printf("\nRetrieving your organization tree as %s...\n", cyanBold(username))
+	fmt.Printf("Getting organization tree as %s...\n", cyanBold(username))
 
-	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "/custom/organizations")
+	url := "/custom/organizations"
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
-		return errors.New("Couldn't retrieve organizations")
+		return errors.New("Couldn't retrieve organization tree")
 	}
 
 	resString := strings.Join(resLines, "")
-	var oRes OrgResponse
-	err = json.Unmarshal([]byte(resString), &oRes)
+	var res TreeResponse
+	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response")
+		return errors.New("Couldn't read JSON response from server")
 	}
 
 	fmt.Print(greenBold("OK\n\n"))
 
-	orgs := oRes.Resources
+	orgs := res.Resources
 	if len(orgs) == 0 {
 		fmt.Println("No organizations found")
 		return nil
 	}
 
-	TreeOutput(oRes, level)
-
+	renderTree(orgs, depth)
 	return nil
 }
 
-func TreeOutput(oRes OrgResponse, level int) {
+// renderTree renders the org tree with a specified level of depth.
+func renderTree(orgs []TreeOrg, depth int) {
+	output := bold("Orgs\n")
 
-	output := bold("Org Tree\n\n")
-	output += bold("Organizations\n")
+	for i, o := range orgs {
+		lastOrg := i == len(orgs)-1
 
-	for i := 0; i < oRes.TotalResults; i++ {
-
-		if i+1 == oRes.TotalResults {
-			output += "└"
+		if lastOrg {
+			output += fmt.Sprintf("└─ %s\n", o.Name)
 		} else {
-			output += "├"
+			output += fmt.Sprintf("├─ %s\n", o.Name)
 		}
 
-		output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Name)
-
-		if len(oRes.Resources[i].Spaces) > 0 && level > 1 {
-			if i+1 == oRes.TotalResults {
+		if len(o.Spaces) > 0 && depth > 0 {
+			if lastOrg {
 				output += bold("    Spaces\n")
 			} else {
 				output += bold("|   Spaces\n")
 			}
-			for j := 0; j < len(oRes.Resources[i].Spaces); j++ {
-				if j+1 == len(oRes.Resources[i].Spaces) && i+1 == oRes.TotalResults {
-					if i+1 == oRes.TotalResults {
-						output += "    └"
-					} else {
-						output += "│   └"
-					}
+
+			for j, s := range o.Spaces {
+				lastSpace := j == len(o.Spaces)-1
+
+				if lastOrg {
+					output += "    "
 				} else {
-					output += "│   ├"
+					output += "|   "
 				}
 
-				output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Spaces[j].Name)
+				if lastSpace {
+					output += fmt.Sprintf("└─ %s\n", s.Name)
+				} else {
+					output += fmt.Sprintf("├─ %s\n", s.Name)
+				}
 
-				if len(oRes.Resources[i].Spaces[j].Applications) > 0 && level > 2 {
-					if j+1 == len(oRes.Resources[i].Spaces) && i+1 == oRes.TotalResults {
-						output += bold("        Applications\n")
+				if len(s.Applications) > 0 && depth > 1 {
+					if lastOrg {
+						output += "    "
 					} else {
-						output += bold("|   |   Applications\n")
+						output += "|   "
 					}
-					for k := 0; k < len(oRes.Resources[i].Spaces[j].Applications); k++ {
-						if k+1 == len(oRes.Resources[i].Spaces[j].Applications) {
-							if j+1 == len(oRes.Resources[i].Spaces) && i+1 == oRes.TotalResults {
-								output += "        └"
-							} else {
-								output += "│   │   └"
-							}
+
+					if lastSpace {
+						output += bold("    Apps\n")
+					} else {
+						output += bold("|   Apps\n")
+					}
+
+					for k, a := range s.Applications {
+						lastApp := k == len(s.Applications)-1
+
+						if lastOrg {
+							output += "    "
 						} else {
-							output += "│   │   ├"
+							output += "|   "
 						}
 
-						output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Spaces[j].Applications[k].Name)
+						if lastSpace {
+							output += "    "
+						} else {
+							output += "|   "
+						}
+
+						if lastApp {
+							output += fmt.Sprintf("└─ %s\n", a.Name)
+						} else {
+							output += fmt.Sprintf("├─ %s\n", a.Name)
+						}
 					}
 				}
 
-				if len(oRes.Resources[i].Spaces[j].ServiceInstances) > 0 && level > 2 {
-					output += bold("|   |   Services\n")
-					for l := 0; l < len(oRes.Resources[i].Spaces[j].ServiceInstances); l++ {
-						if l+1 == len(oRes.Resources[i].Spaces[j].ServiceInstances) {
-							if j+1 == len(oRes.Resources[i].Spaces) && i+1 == oRes.TotalResults {
-								output += "        └"
-							} else {
-								output += "│   │   └"
-							}
+				if len(s.ServiceInstances) > 0 && depth > 1 {
+					if lastOrg {
+						output += "    "
+					} else {
+						output += "|   "
+					}
+
+					if lastSpace {
+						output += bold("    Services\n")
+					} else {
+						output += bold("|   Services\n")
+					}
+
+					for k, si := range s.ServiceInstances {
+						lastService := k == len(s.ServiceInstances)-1
+
+						if lastOrg {
+							output += "    "
 						} else {
-							output += "│   │   ├"
+							output += "|   "
 						}
 
-						output += fmt.Sprintf("─ %s\n", oRes.Resources[i].Spaces[j].ServiceInstances[l].Name)
+						if lastSpace {
+							output += "    "
+						} else {
+							output += "|   "
+						}
+
+						if lastService {
+							output += fmt.Sprintf("└─ %s\n", si.Name)
+						} else {
+							output += fmt.Sprintf("├─ %s\n", si.Name)
+						}
 					}
 				}
 			}
