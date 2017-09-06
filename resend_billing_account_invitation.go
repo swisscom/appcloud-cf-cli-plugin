@@ -18,7 +18,7 @@ func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, 
 
 	fmt.Printf("Resending invitation for %s to billing account %s as %s\n", cyanBold(invitee), cyanBold(billingAccountName), cyanBold(username))
 
-	ba, err := GetBillingAccount(c, billingAccountName)
+	ba, err := getBillingAccount(c, billingAccountName)
 	if err != nil {
 		return fmt.Errorf("Billing account %s not found", billingAccountName)
 	}

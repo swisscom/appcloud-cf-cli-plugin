@@ -39,8 +39,8 @@ type BillingAccountResponse struct {
 	ServerResponseError
 }
 
-// GetBillingAccount retrieves a billing account by name.
-func GetBillingAccount(c plugin.CliConnection, name string) (BillingAccount, error) {
+// getBillingAccount retrieves a billing account by name.
+func getBillingAccount(c plugin.CliConnection, name string) (BillingAccount, error) {
 	accURL := url.QueryEscape("/custom/accounts?q=name:%s")
 	resLines, err := c.CliCommand("curl", accURL)
 
