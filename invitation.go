@@ -11,13 +11,8 @@ import (
 
 // Invitation is an invitation a user received to join a specific entity.
 type Invitation struct {
-	Metadata struct {
-		GUID      string `json:"guid"`
-		URL       string `json:"url"`
-		CreatedAt string `json:"created_at"`
-		UpdatedAt string `json:"updated_at"`
-	} `json:"metadata"`
-	Entity struct {
+	Metadata CFMetadata `json:"metadata"`
+	Entity   struct {
 		Invitee          string   `json:"invitee"`
 		Roles            []string `json:"roles"`
 		ActorUsername    string   `json:"actor_username"`

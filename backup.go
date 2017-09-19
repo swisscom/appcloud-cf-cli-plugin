@@ -4,8 +4,9 @@ package main
 type Backup struct {
 	Metadata CFMetadata `json:"metadata"`
 	Entity   struct {
-		ServiceInstanceID string `json:"service_instance_id"`
-		Status            string `json:"status"`
+		ServiceInstanceID string    `json:"service_instance_id"`
+		Status            string    `json:"status"`
+		Restores          []Restore `json:"restores"`
 	} `json:"entity"`
 }
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"code.cloudfoundry.org/cli/plugin"
 )
@@ -50,7 +51,17 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 
 	fmt.Println(bold("     created at             GUID                                   last operation"))
 	for i, b := range backups {
-		fmt.Printf("#%v   %s   %s   %s\n", i, b.Metadata.CreatedAt, b.Metadata.GUID, formatStatus(b.Entity.Status))
+		var newestRestoreDate time.Time
+		overallStatus := b.Entity.Status
+
+		for _, r := range b.Entity.Restores {
+			if r.Metadata.CreatedAt.After(newestRestoreDate) {
+				overallStatus = fmt.Sprintf("RESTORE %s", r.Entity.Status)
+				newestRestoreDate = r.Metadata.CreatedAt
+			}
+		}
+
+		fmt.Printf("#%v   %s   %s   %s\n", i, b.Metadata.CreatedAt.Format(time.RFC3339), b.Metadata.GUID, formatStatus(overallStatus))
 	}
 	return nil
 }

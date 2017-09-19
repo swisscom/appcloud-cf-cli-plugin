@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"code.cloudfoundry.org/cli/plugin"
 )
@@ -50,7 +51,7 @@ func (p *AppCloudPlugin) ServiceEvents(c plugin.CliConnection, serviceInstanceNa
 
 	fmt.Println(bold("time                   event"))
 	for _, e := range events {
-		fmt.Printf("%s   %s   %s\n", cyanBold(e.Metadata.CreatedAt), e.Entity.Type, e.Entity.ActorName)
+		fmt.Printf("%s   %s   %s\n", cyanBold(e.Metadata.CreatedAt.Format(time.RFC3339)), e.Entity.Type, e.Entity.ActorName)
 	}
 	return nil
 }
