@@ -17,13 +17,13 @@ type InviteOrgUserRequest struct {
 }
 
 // InviteOrgUser invites a user to join an org with a specific set of roles.
-func (p *AppCloudPlugin) InviteOrgUser(c plugin.CliConnection, orgName string, invitee string, roles string) error {
+func (p *AppCloudPlugin) InviteOrgUser(c plugin.CliConnection, invitee string, orgName string, roles string) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
 	}
 
-	fmt.Printf("Inviting %s to org %s as %s\n", cyanBold(invitee), cyanBold(orgName), cyanBold(username))
+	fmt.Printf("Inviting %s to org %s as %s\n...", cyanBold(invitee), cyanBold(orgName), cyanBold(username))
 
 	o, err := c.GetOrg(orgName)
 	if err != nil {
@@ -41,7 +41,7 @@ func (p *AppCloudPlugin) InviteOrgUser(c plugin.CliConnection, orgName string, i
 	}
 
 	url := "/custom/organization_invitations"
-	resLines, err := c.CliCommand("curl", "-H", "Content-Type: application/json", "-X", "POST", url, "-d", string(argsData))
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "POST", url, "-d", string(argsData))
 
 	if err != nil {
 		return fmt.Errorf("Couldn't invite %s to org %s", invitee, orgName)

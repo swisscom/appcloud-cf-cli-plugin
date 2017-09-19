@@ -42,7 +42,7 @@ type BillingAccountResponse struct {
 // getBillingAccount retrieves a billing account by name.
 func getBillingAccount(c plugin.CliConnection, name string) (BillingAccount, error) {
 	accURL := url.QueryEscape("/custom/accounts?q=name:%s")
-	resLines, err := c.CliCommand("curl", accURL)
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", accURL)
 
 	if err != nil {
 		return BillingAccount{}, fmt.Errorf("Billing Account %s not found", name)

@@ -17,13 +17,13 @@ type InviteBillingAccountUserRequest struct {
 }
 
 // InviteBillingAccountUser invites a user to join a billing account with a specific set of roles.
-func (p *AppCloudPlugin) InviteBillingAccountUser(c plugin.CliConnection, billingAccountName string, invitee string) error {
+func (p *AppCloudPlugin) InviteBillingAccountUser(c plugin.CliConnection, invitee string, billingAccountName string) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
 	}
 
-	fmt.Printf("Inviting %s to billing account %s as %s\n", cyanBold(invitee), cyanBold(billingAccountName), cyanBold(username))
+	fmt.Printf("Inviting %s to billing account %s as %s...\n", cyanBold(invitee), cyanBold(billingAccountName), cyanBold(username))
 
 	ba, err := getBillingAccount(c, billingAccountName)
 	if err != nil {
@@ -41,7 +41,7 @@ func (p *AppCloudPlugin) InviteBillingAccountUser(c plugin.CliConnection, billin
 	}
 
 	url := "/custom/account_invitations"
-	resLines, err := c.CliCommand("curl", "-H", "Content-Type: application/json", "-X", "POST", url, "-d", string(argsData))
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "POST", url, "-d", string(argsData))
 
 	if err != nil {
 		return fmt.Errorf("Couldn't invite %s to billing account %s", invitee, billingAccountName)

@@ -16,7 +16,7 @@ func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, 
 		username = "you"
 	}
 
-	fmt.Printf("Resending invitation for %s to billing account %s as %s\n", cyanBold(invitee), cyanBold(billingAccountName), cyanBold(username))
+	fmt.Printf("Resending invitation for %s to billing account %s as %s...\n", cyanBold(invitee), cyanBold(billingAccountName), cyanBold(username))
 
 	ba, err := getBillingAccount(c, billingAccountName)
 	if err != nil {

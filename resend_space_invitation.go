@@ -16,7 +16,7 @@ func (p *AppCloudPlugin) ResendSpaceInvitation(c plugin.CliConnection, spaceName
 		username = "you"
 	}
 
-	fmt.Printf("Resending invitation for %s to space %s as %s\n", cyanBold(invitee), cyanBold(spaceName), cyanBold(username))
+	fmt.Printf("Resending invitation for %s to space %s as %s...\n", cyanBold(invitee), cyanBold(spaceName), cyanBold(username))
 
 	s, err := c.GetSpace(spaceName)
 	if err != nil {

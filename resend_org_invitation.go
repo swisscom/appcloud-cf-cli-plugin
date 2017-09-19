@@ -16,7 +16,7 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, orgName str
 		username = "you"
 	}
 
-	fmt.Printf("Resending invitation for %s to org %s as %s\n", cyanBold(invitee), cyanBold(orgName), cyanBold(username))
+	fmt.Printf("Resending invitation for %s to org %s as %s...\n", cyanBold(invitee), cyanBold(orgName), cyanBold(username))
 
 	o, err := c.GetOrg(orgName)
 	if err != nil {

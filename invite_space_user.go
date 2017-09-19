@@ -17,13 +17,13 @@ type InviteSpaceUserRequest struct {
 }
 
 // InviteSpaceUser invites a user to join an space with a specific set of roles.
-func (p *AppCloudPlugin) InviteSpaceUser(c plugin.CliConnection, spaceName string, invitee string, roles string) error {
+func (p *AppCloudPlugin) InviteSpaceUser(c plugin.CliConnection, invitee string, spaceName string, roles string) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
 	}
 
-	fmt.Printf("Inviting %s to space %s as %s\n", cyanBold(invitee), cyanBold(spaceName), cyanBold(username))
+	fmt.Printf("Inviting %s to space %s as %s...\n", cyanBold(invitee), cyanBold(spaceName), cyanBold(username))
 
 	s, err := c.GetSpace(spaceName)
 	if err != nil {
@@ -41,7 +41,7 @@ func (p *AppCloudPlugin) InviteSpaceUser(c plugin.CliConnection, spaceName strin
 	}
 
 	url := "/custom/space_invitations"
-	resLines, err := c.CliCommand("curl", "-H", "Content-Type: application/json", "-X", "POST", url, "-d", string(argsData))
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "POST", url, "-d", string(argsData))
 
 	if err != nil {
 		return fmt.Errorf("Couldn't invite %s to space %s", invitee, spaceName)
