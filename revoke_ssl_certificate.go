@@ -28,6 +28,10 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, domain str
 		return fmt.Errorf("Couldn't retrieve current space")
 	}
 
+	if s.Guid == "" {
+		return fmt.Errorf("No space targeted, use %s to target a space", cyanBold("'cf target -s SPACE'"))
+	}
+
 	req := SSLCertificateRequest{
 		SpaceID:        s.Guid,
 		FullDomainName: fullDomain,

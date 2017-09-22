@@ -300,14 +300,14 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	case "ssl-certificates":
 		err = p.SSLCertificates(cliConnection)
 	case "create-ssl-certificate":
-		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+		if len(args) != 3 {
+			fmt.Println("Incorrect Usage: the required arguments DOMAIN and/or ROUTE was not provided")
 			return
 		}
 
 		fc, err := parseSSLCertificateArgs(args)
 		if err != nil {
-			fmt.Println("Incorrect Usage: Organization option must be a string")
+			fmt.Println("Incorrect Usage: DOMAIN must be a string")
 			return
 		}
 
