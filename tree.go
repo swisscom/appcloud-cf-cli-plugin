@@ -36,14 +36,14 @@ type TreeSpace struct {
 type TreeApp struct {
 	ID            string `json:"id"`
 	Name          string `json:"name"`
-	BackupIconUrl string `json:"buildpack_icon_url"`
+	BackupIconURL string `json:"buildpack_icon_url"`
 }
 
 // TreeService is a service instance node of the tree structure.
 type TreeService struct {
 	ID             string `json:"id"`
 	Name           string `json:"name"`
-	ServiceIconUrl string `json:"service_icon_url"`
+	ServiceIconURL string `json:"service_icon_url"`
 }
 
 // Tree renders the org tree for the current user.
@@ -97,7 +97,7 @@ func renderTree(orgs []TreeOrg, depth int) {
 			if lastOrg {
 				output += bold("    Spaces\n")
 			} else {
-				output += bold("|   Spaces\n")
+				output += bold("│   Spaces\n")
 			}
 
 			for j, s := range o.Spaces {
@@ -106,7 +106,7 @@ func renderTree(orgs []TreeOrg, depth int) {
 				if lastOrg {
 					output += "    "
 				} else {
-					output += "|   "
+					output += "│   "
 				}
 
 				if lastSpace {
@@ -119,13 +119,13 @@ func renderTree(orgs []TreeOrg, depth int) {
 					if lastOrg {
 						output += "    "
 					} else {
-						output += "|   "
+						output += "│   "
 					}
 
 					if lastSpace {
 						output += bold("    Apps\n")
 					} else {
-						output += bold("|   Apps\n")
+						output += bold("│   Apps\n")
 					}
 
 					for k, a := range s.Applications {
@@ -134,13 +134,13 @@ func renderTree(orgs []TreeOrg, depth int) {
 						if lastOrg {
 							output += "    "
 						} else {
-							output += "|   "
+							output += "│   "
 						}
 
 						if lastSpace {
 							output += "    "
 						} else {
-							output += "|   "
+							output += "│   "
 						}
 
 						if lastApp {
@@ -155,13 +155,13 @@ func renderTree(orgs []TreeOrg, depth int) {
 					if lastOrg {
 						output += "    "
 					} else {
-						output += "|   "
+						output += "│   "
 					}
 
 					if lastSpace {
 						output += bold("    Services\n")
 					} else {
-						output += bold("|   Services\n")
+						output += bold("│   Services\n")
 					}
 
 					for k, si := range s.ServiceInstances {
@@ -170,13 +170,13 @@ func renderTree(orgs []TreeOrg, depth int) {
 						if lastOrg {
 							output += "    "
 						} else {
-							output += "|   "
+							output += "│   "
 						}
 
 						if lastSpace {
 							output += "    "
 						} else {
-							output += "|   "
+							output += "│   "
 						}
 
 						if lastService {
