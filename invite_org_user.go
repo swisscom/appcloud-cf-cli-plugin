@@ -23,7 +23,7 @@ func (p *AppCloudPlugin) InviteOrgUser(c plugin.CliConnection, invitee string, o
 		username = "you"
 	}
 
-	fmt.Printf("Inviting %s to org %s as %s\n...", cyanBold(invitee), cyanBold(orgName), cyanBold(username))
+	fmt.Printf("Inviting %s to org %s as %s...\n", cyanBold(invitee), cyanBold(orgName), cyanBold(username))
 
 	o, err := c.GetOrg(orgName)
 	if err != nil {

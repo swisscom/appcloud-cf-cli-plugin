@@ -30,7 +30,21 @@ func (p *AppCloudPlugin) Invitations(c plugin.CliConnection) error {
 	fmt.Println(bold("GUID                                   entity type       entity"))
 	for _, inv := range invitations {
 		entityType, entityName := invitationEntityTypeAndName(inv)
-		fmt.Printf("%s   %s   %s\n", inv.Metadata.GUID, entityType, entityName)
+		fmt.Printf("%s   %s   %s\n", inv.Metadata.GUID, formatEntityType(entityType), entityName)
 	}
 	return nil
+}
+
+// formatEntityType formats an entity name more nicely.
+func formatEntityType(t string) string {
+	switch t {
+	case "account":
+		return "Billing Account"
+	case "organization":
+		return "Org            "
+	case "space":
+		return "Space          "
+	default:
+		return "unknown        "
+	}
 }

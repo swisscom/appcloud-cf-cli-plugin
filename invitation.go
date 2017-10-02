@@ -45,15 +45,15 @@ func invitationEntityTypeAndName(inv Invitation) (string, string) {
 	var entityType string
 	var entityName string
 	if inv.Entity.AccountID != "" {
-		entityType = "Billing Account"
+		entityType = "account"
 		entityName = inv.Entity.AccountName
 	}
 	if inv.Entity.OrganizationID != "" {
-		entityType = "Org            "
+		entityType = "organization"
 		entityName = inv.Entity.OrganizationName
 	}
 	if inv.Entity.SpaceID != "" {
-		entityType = "Space          "
+		entityType = "space"
 		entityName = fmt.Sprintf("%s / %s", inv.Entity.OrganizationName, inv.Entity.SpaceName)
 	}
 
