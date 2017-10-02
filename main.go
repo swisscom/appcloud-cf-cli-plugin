@@ -76,6 +76,27 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 
 			// Send invitations
 			{
+				Name:     "billing-account-invitations",
+				HelpText: "List all invitations for a billing account",
+				UsageDetails: plugin.Usage{
+					Usage: "billing-account-invitations BILLING_ACCOUNT",
+				},
+			},
+			{
+				Name:     "org-invitations",
+				HelpText: "List all invitations for an org",
+				UsageDetails: plugin.Usage{
+					Usage: "org-invitations ORG",
+				},
+			},
+			{
+				Name:     "space-invitations",
+				HelpText: "List all invitations for a space",
+				UsageDetails: plugin.Usage{
+					Usage: "space-invitations SPACE",
+				},
+			},
+			{
 				Name:     "invite-billing-account-user",
 				HelpText: "Invite a user to a billing account as an 'accountOwner'",
 				UsageDetails: plugin.Usage{
@@ -256,6 +277,27 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		err = p.DeclineInvitation(cliConnection, args[1])
 
 	// Send invitations
+	case "billing-account-invitations":
+		if len(args) != 2 {
+			fmt.Println("Incorrect Usage: the required argument BILLING_ACCOUNT was not provided")
+			return
+		}
+
+		err = p.BillingAccountInvitations(cliConnection, args[1])
+	case "org-invitations":
+		if len(args) != 2 {
+			fmt.Println("Incorrect Usage: the required argument ORG was not provided")
+			return
+		}
+
+		err = p.OrgInvitations(cliConnection, args[1])
+	case "space-invitations":
+		if len(args) != 2 {
+			fmt.Println("Incorrect Usage: the required argument SPACE was not provided")
+			return
+		}
+
+		err = p.SpaceInvitations(cliConnection, args[1])
 	case "invite-billing-account-user":
 		if len(args) != 3 {
 			fmt.Println("Incorrect Usage: the required arguments USERNAME and/or BILLING_ACCOUNT were not provided")
