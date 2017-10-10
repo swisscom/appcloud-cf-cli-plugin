@@ -71,6 +71,9 @@ func formatStatus(s string) string {
 	if s == "VALID_INST" {
 		s = "INSTALLED"
 	}
+	if s == "VALID_UNINST" {
+		s = "UNINSTALLED"
+	}
 
 	formatted := strings.Replace(s, "_", " ", -1)
 	formatted = strings.ToLower(formatted)
