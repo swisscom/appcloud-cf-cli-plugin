@@ -42,14 +42,15 @@ func (p *AppCloudPlugin) SpaceInvitations(c plugin.CliConnection, spaceName stri
 
 	fmt.Println(greenBold("OK\n\n"))
 
-	if len(res.Resources) == 0 {
+	invitations := res.Resources
+	if len(invitations) > 0 {
+		table := NewTable([]string{"invitee", "roles", "status"})
+		for _, inv := range res.Resources {
+			table.Add(inv.Entity.Invitee, strings.Join(inv.Entity.Roles, ","), inv.Entity.Status)
+		}
+		table.Print()
+	} else {
 		fmt.Println("No invitations found")
-		return nil
-	}
-
-	fmt.Println(bold("Invitee                                   roles                 status"))
-	for _, inv := range res.Resources {
-		fmt.Printf("%s   %s   %s\n", inv.Entity.Invitee, inv.Entity.Roles, inv.Entity.Status)
 	}
 	return nil
 }

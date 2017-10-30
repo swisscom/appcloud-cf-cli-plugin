@@ -44,14 +44,14 @@ func (p *AppCloudPlugin) ServiceEvents(c plugin.CliConnection, serviceInstanceNa
 	fmt.Print(greenBold("OK\n\n"))
 
 	events := res.Resources
-	if len(events) == 0 {
+	if len(events) > 0 {
+		table := NewTable([]string{"time", "event", "actor"})
+		for _, e := range events {
+			table.Add(e.Metadata.CreatedAt.Format(time.RFC3339), e.Entity.Type, e.Entity.ActorName)
+		}
+		table.Print()
+	} else {
 		fmt.Println("No events found")
-		return nil
-	}
-
-	fmt.Println(bold("time                   event"))
-	for _, e := range events {
-		fmt.Printf("%s   %s   %s\n", cyanBold(e.Metadata.CreatedAt.Format(time.RFC3339)), e.Entity.Type, e.Entity.ActorName)
 	}
 	return nil
 }

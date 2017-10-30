@@ -22,15 +22,15 @@ func (p *AppCloudPlugin) Invitations(c plugin.CliConnection) error {
 
 	fmt.Print(greenBold("OK\n\n"))
 
-	if len(invitations) == 0 {
+	if len(invitations) > 0 {
+		table := NewTable([]string{"GUID", "entity type", "entity"})
+		for _, inv := range invitations {
+			entityType, entityName := invitationEntityTypeAndName(inv)
+			table.Add(inv.Metadata.GUID, formatEntityType(entityType), entityName)
+		}
+		table.Print()
+	} else {
 		fmt.Println("No invitations found")
-		return nil
-	}
-
-	fmt.Println(bold("GUID                                   entity type       entity"))
-	for _, inv := range invitations {
-		entityType, entityName := invitationEntityTypeAndName(inv)
-		fmt.Printf("%s   %s   %s\n", inv.Metadata.GUID, formatEntityType(entityType), entityName)
 	}
 	return nil
 }

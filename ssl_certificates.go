@@ -42,13 +42,15 @@ func (p *AppCloudPlugin) SSLCertificates(c plugin.CliConnection) error {
 
 	fmt.Println(greenBold("OK\n\n"))
 
-	if len(res.Resources) == 0 {
+	if len(res.Resources) > 0 {
+		table := NewTable([]string{"full domain name", "status"})
+		for _, cert := range res.Resources {
+			table.Add(cert.Entity.FullDomainName, formatStatus(cert.Entity.Status))
+		}
+		table.Print()
+	} else {
 		fmt.Println("No SSL certificates found")
 	}
 
-	fmt.Println(bold("full domain name"))
-	for _, cert := range res.Resources {
-		fmt.Printf("%s   (%s)\n", cert.Entity.FullDomainName, formatStatus(cert.Entity.Status))
-	}
 	return nil
 }

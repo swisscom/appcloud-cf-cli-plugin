@@ -44,24 +44,24 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 	fmt.Print(greenBold("OK\n\n"))
 
 	backups := res.Resources
-	if len(backups) == 0 {
-		fmt.Println("No backups found")
-		return nil
-	}
+	if len(backups) > 0 {
+		table := NewTable([]string{"created at", "GUID", "last operation"})
+		for _, b := range backups {
+			var newestRestoreDate time.Time
+			overallStatus := b.Entity.Status
 
-	fmt.Println(bold("     created at             GUID                                   last operation"))
-	for i, b := range backups {
-		var newestRestoreDate time.Time
-		overallStatus := b.Entity.Status
-
-		for _, r := range b.Entity.Restores {
-			if r.Metadata.CreatedAt.After(newestRestoreDate) {
-				overallStatus = fmt.Sprintf("RESTORE %s", r.Entity.Status)
-				newestRestoreDate = r.Metadata.CreatedAt
+			for _, r := range b.Entity.Restores {
+				if r.Metadata.CreatedAt.After(newestRestoreDate) {
+					overallStatus = fmt.Sprintf("RESTORE %s", r.Entity.Status)
+					newestRestoreDate = r.Metadata.CreatedAt
+				}
 			}
-		}
 
-		fmt.Printf("#%v   %s   %s   %s\n", i, b.Metadata.CreatedAt.Format(time.RFC3339), b.Metadata.GUID, formatStatus(overallStatus))
+			table.Add(b.Metadata.CreatedAt.Format(time.RFC3339), b.Metadata.GUID, formatStatus(overallStatus))
+		}
+		table.Print()
+	} else {
+		fmt.Println("No backups found")
 	}
 	return nil
 }
