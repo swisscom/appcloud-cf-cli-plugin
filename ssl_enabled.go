@@ -28,6 +28,10 @@ func (p *AppCloudPlugin) SSLEnabled(c plugin.CliConnection, domain string, hostn
 		return fmt.Errorf("Couldn't retrieve current space")
 	}
 
+	if s.Guid == "" {
+		return fmt.Errorf("No space targeted, use %s to target a space", cyanBold("'cf target -s SPACE'"))
+	}
+
 	url := fmt.Sprintf("/custom/spaces/%s/certificates", s.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {

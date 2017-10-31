@@ -16,9 +16,21 @@ func (p *AppCloudPlugin) SSLCertificates(c plugin.CliConnection) error {
 		username = "you"
 	}
 
+	o, oerr := c.GetCurrentOrg()
+	if oerr != nil {
+		return fmt.Errorf("Couldn't retrieve current org %s", oerr.Error())
+	}
+	if o.Guid == "" {
+		return fmt.Errorf("No org and space targeted, use %s to target an org and space", cyanBold("'cf target -o ORG -s SPACE'"))
+	}
+
 	s, err := c.GetCurrentSpace()
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve current space")
+		return fmt.Errorf("Couldn't retrieve current space %s", err.Error())
+	}
+
+	if s.Guid == "" {
+		return fmt.Errorf("No space targeted, use %s to target a space", cyanBold("'cf target -s SPACE'"))
 	}
 
 	fmt.Printf("Getting SSL certificates for space %s as %s...\n", cyanBold(s.Name), cyanBold(username))
