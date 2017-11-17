@@ -35,6 +35,9 @@ func (p *AppCloudPlugin) InviteOrgUser(c plugin.CliConnection, invitee string, o
 		OrgID:   o.Guid,
 		Roles:   strings.Split(roles, ","),
 	}
+	if len(args.Roles) == 1 && args.Roles[0] == "" {
+		args.Roles = []string{}
+	}
 	argsData, err := json.Marshal(args)
 	if err != nil {
 		return fmt.Errorf("Couldn't parse JSON data")
@@ -54,7 +57,7 @@ func (p *AppCloudPlugin) InviteOrgUser(c plugin.CliConnection, invitee string, o
 		return errors.New("Couldn't read JSON response from server")
 	}
 
-	if res.Entity.Status != "SENT" {
+	if res.Entity.Status != "SENT" && res.Entity.Status != "CONFIRMED" {
 		return fmt.Errorf("Couldn't send invitation. Current status: %s", res.Entity.Status)
 	}
 

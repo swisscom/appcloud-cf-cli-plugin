@@ -35,6 +35,9 @@ func (p *AppCloudPlugin) InviteSpaceUser(c plugin.CliConnection, invitee string,
 		SpaceID: s.Guid,
 		Roles:   strings.Split(roles, ","),
 	}
+	if len(args.Roles) == 1 && args.Roles[0] == "" {
+		args.Roles = []string{}
+	}
 	argsData, err := json.Marshal(args)
 	if err != nil {
 		return errors.New("Couldn't parse JSON data")
@@ -54,7 +57,7 @@ func (p *AppCloudPlugin) InviteSpaceUser(c plugin.CliConnection, invitee string,
 		return errors.New("Couldn't read JSON response from server")
 	}
 
-	if res.Entity.Status != "SENT" {
+	if res.Entity.Status != "SENT" && res.Entity.Status != "CONFIRMED" {
 		return fmt.Errorf("Couldn't send invitation. Current status: %s", res.Entity.Status)
 	}
 
