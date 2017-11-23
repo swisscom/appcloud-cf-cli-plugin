@@ -10,7 +10,7 @@ import (
 )
 
 // ResendSpaceInvitation resends an existing space invitation.
-func (p *AppCloudPlugin) ResendSpaceInvitation(c plugin.CliConnection, spaceName string, invitee string) error {
+func (p *AppCloudPlugin) ResendSpaceInvitation(c plugin.CliConnection, invitee string, spaceName string) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
@@ -50,6 +50,10 @@ func (p *AppCloudPlugin) ResendSpaceInvitation(c plugin.CliConnection, spaceName
 			err = json.Unmarshal([]byte(invResString), &invRes)
 			if err != nil {
 				return errors.New("Couldn't read JSON response from server")
+			}
+
+			if invRes.ErrorCode != "" {
+				return errors.New(invRes.Description)
 			}
 		}
 	}

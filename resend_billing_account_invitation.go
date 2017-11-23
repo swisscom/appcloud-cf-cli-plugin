@@ -10,7 +10,7 @@ import (
 )
 
 // ResendBillingAccountInvitation resends an existing billing account invitation.
-func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, billingAccountName string, invitee string) error {
+func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, invitee string, billingAccountName string) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
@@ -50,6 +50,10 @@ func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, 
 			err = json.Unmarshal([]byte(invResString), &invRes)
 			if err != nil {
 				return errors.New("Couldn't read JSON response from server")
+			}
+
+			if invRes.ErrorCode != "" {
+				return errors.New(invRes.Description)
 			}
 		}
 	}

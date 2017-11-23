@@ -121,7 +121,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "resend-billing-account-invitation",
 				HelpText: "Resend an existing billing account invitation",
 				UsageDetails: plugin.Usage{
-					Usage: "resend-org-invitation USERNAME BILLING_ACCOUNT",
+					Usage: "resend-billing-account-invitation USERNAME BILLING_ACCOUNT",
 				},
 			},
 			{
@@ -135,7 +135,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "resend-space-invitation",
 				HelpText: "Resend an existing space invitation",
 				UsageDetails: plugin.Usage{
-					Usage: "resend-org-invitation USERNAME SPACE",
+					Usage: "resend-space-invitation USERNAME SPACE",
 				},
 			},
 
@@ -342,25 +342,27 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	case "ssl-certificates":
 		err = p.SSLCertificates(cliConnection)
 	case "create-ssl-certificate":
-		if len(args) < 2 {
+		if len(args) < 2 || len(args) > 4 {
 			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
 			return
 		}
 
-		fc, err := parseSSLCertificateArgs(args)
+		var fc flags.FlagContext
+		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
 			fmt.Println("Incorrect Usage: Organization option must be a string")
 			return
 		}
 
-		err = p.CreateSSLCertificate(cliConnection, args[2], fc.String("n"))
+		err = p.CreateSSLCertificate(cliConnection, args[1], fc.String("n"))
 	case "revoke-ssl-certificate":
 		if len(args) < 2 {
 			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
 			return
 		}
 
-		fc, err := parseSSLCertificateArgs(args)
+		var fc flags.FlagContext
+		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
 			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
 			return
@@ -373,7 +375,8 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 			return
 		}
 
-		fc, err := parseSSLCertificateArgs(args)
+		var fc flags.FlagContext
+		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
 			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
 			return
@@ -386,7 +389,8 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 			return
 		}
 
-		fc, err := parseSSLCertificateArgs(args)
+		var fc flags.FlagContext
+		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
 			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
 			return
@@ -399,7 +403,8 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 			return
 		}
 
-		fc, err := parseSSLCertificateArgs(args)
+		var fc flags.FlagContext
+		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
 			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
 			return
@@ -409,7 +414,8 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 
 	// Tree
 	case "tree":
-		fc, err := parseTreeArgs(args)
+		var fc flags.FlagContext
+		fc, err = parseTreeArgs(args)
 		if err != nil {
 			fmt.Println("Incorrect Usage: DEPTH must be an integer")
 			return

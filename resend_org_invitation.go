@@ -10,7 +10,7 @@ import (
 )
 
 // ResendOrgInvitation resends an existing org invitation.
-func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, orgName string, invitee string) error {
+func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, invitee string, orgName string) error {
 	username, err := c.Username()
 	if err != nil {
 		username = "you"
@@ -50,6 +50,10 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, orgName str
 			err = json.Unmarshal([]byte(invResString), &invRes)
 			if err != nil {
 				return errors.New("Couldn't read JSON response from server")
+			}
+
+			if invRes.ErrorCode != "" {
+				return errors.New(invRes.Description)
 			}
 		}
 	}
