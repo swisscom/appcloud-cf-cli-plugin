@@ -95,9 +95,9 @@ func renderTree(orgs []TreeOrg, depth int) {
 
 		if len(o.Spaces) > 0 && depth > 0 {
 			if lastOrg {
-				output += bold("    Spaces\n")
+				output += "    " + bold("Spaces\n")
 			} else {
-				output += bold("│   Spaces\n")
+				output += "│   " + bold("Spaces\n")
 			}
 
 			for j, s := range o.Spaces {
@@ -123,9 +123,9 @@ func renderTree(orgs []TreeOrg, depth int) {
 					}
 
 					if lastSpace {
-						output += bold("    Apps\n")
+						output += "    " + bold("Apps\n")
 					} else {
-						output += bold("│   Apps\n")
+						output += "│   " + bold("Apps\n")
 					}
 
 					for k, a := range s.Applications {
@@ -159,9 +159,9 @@ func renderTree(orgs []TreeOrg, depth int) {
 					}
 
 					if lastSpace {
-						output += bold("    Services\n")
+						output += "    " + bold("Services\n")
 					} else {
-						output += bold("│   Services\n")
+						output += "│   " + bold("Services\n")
 					}
 
 					for k, si := range s.ServiceInstances {
