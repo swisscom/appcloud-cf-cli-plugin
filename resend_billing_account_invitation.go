@@ -2,38 +2,41 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
+
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
 )
 
 // ResendBillingAccountInvitation resends an existing billing account invitation.
 func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, invitee string, billingAccountName string) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
-	fmt.Printf("Resending invitation for %s to billing account %s as %s...\n", cyanBold(invitee), cyanBold(billingAccountName), cyanBold(username))
+	p.ui.Say("Resending invitation for %s to billing account %s as %s...", terminal.EntityNameColor(invitee), terminal.EntityNameColor(billingAccountName), terminal.EntityNameColor(un))
 
 	ba, err := getBillingAccount(c, billingAccountName)
 	if err != nil {
-		return fmt.Errorf("Billing account %s not found", billingAccountName)
+		return errors.Wrap(err, "Billing account not found")
 	}
 
 	url := fmt.Sprintf("/custom/accounts/%s/invitations", ba.Metadata.GUID)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
-		return fmt.Errorf("Couldn't get invitations for billing account %s", billingAccountName)
+		return errors.Wrap(err, "Couldn't get invitations for billing account")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res InvitationsResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response from server")
+		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	if res.ErrorCode != "" {
@@ -49,7 +52,7 @@ func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, 
 
 			err = json.Unmarshal([]byte(invResString), &invRes)
 			if err != nil {
-				return errors.New("Couldn't read JSON response from server")
+				return errors.Wrap(err, "Couldn't read JSON response from server")
 			}
 
 			if invRes.ErrorCode != "" {
@@ -58,7 +61,8 @@ func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, 
 		}
 	}
 
-	fmt.Println(greenBold("OK\n\n"))
-	fmt.Println("Invitation resent")
+	p.ui.Say(terminal.SuccessColor("OK\n"))
+	p.ui.Say("Invitation resent")
+
 	return nil
 }

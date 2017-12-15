@@ -1,36 +1,36 @@
 package main
 
 import (
-	"fmt"
-
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
+	"github.com/pkg/errors"
 )
 
 // Invitations retrieves a user's invitations.
 func (p *AppCloudPlugin) Invitations(c plugin.CliConnection) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
-	fmt.Printf("Getting invitations as %s...\n", cyanBold(username))
+	p.ui.Say("Getting invitations as %s...", terminal.EntityNameColor(un))
 
 	invitations, err := getAllInvitations(c)
 	if err != nil {
 		return err
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
+	p.ui.Say(terminal.SuccessColor("OK\n"))
 
 	if len(invitations) > 0 {
-		table := NewTable([]string{"GUID", "entity type", "entity"})
+		table := p.ui.Table([]string{"GUID", "entity type", "entity"})
 		for _, inv := range invitations {
 			entityType, entityName := invitationEntityTypeAndName(inv)
 			table.Add(inv.Metadata.GUID, formatEntityType(entityType), entityName)
 		}
 		table.Print()
 	} else {
-		fmt.Println("No invitations found")
+		p.ui.Say("No invitations found")
 	}
 	return nil
 }

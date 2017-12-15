@@ -2,38 +2,41 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
+
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
 )
 
 // ResendSpaceInvitation resends an existing space invitation.
 func (p *AppCloudPlugin) ResendSpaceInvitation(c plugin.CliConnection, invitee string, spaceName string) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
-	fmt.Printf("Resending invitation for %s to space %s as %s...\n", cyanBold(invitee), cyanBold(spaceName), cyanBold(username))
+	p.ui.Say("Resending invitation for %s to space %s as %s...", terminal.EntityNameColor(invitee), terminal.EntityNameColor(spaceName), terminal.EntityNameColor(un))
 
 	s, err := c.GetSpace(spaceName)
 	if err != nil {
-		return fmt.Errorf("Space %s not found", spaceName)
+		return errors.Wrap(err, "Space not found")
 	}
 
 	url := fmt.Sprintf("/custom/spaces/%s/invitations", s.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
-		return fmt.Errorf("Couldn't get invitations for space %s", spaceName)
+		return errors.Wrap(err, "Couldn't get invitations for space")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res InvitationsResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response from server")
+		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	if res.ErrorCode != "" {
@@ -49,7 +52,7 @@ func (p *AppCloudPlugin) ResendSpaceInvitation(c plugin.CliConnection, invitee s
 
 			err = json.Unmarshal([]byte(invResString), &invRes)
 			if err != nil {
-				return errors.New("Couldn't read JSON response from server")
+				return errors.Wrap(err, "Couldn't read JSON response from server")
 			}
 
 			if invRes.ErrorCode != "" {
@@ -58,7 +61,8 @@ func (p *AppCloudPlugin) ResendSpaceInvitation(c plugin.CliConnection, invitee s
 		}
 	}
 
-	fmt.Println(greenBold("OK\n\n"))
-	fmt.Println("Invitation resent")
+	p.ui.Say(terminal.SuccessColor("OK\n"))
+	p.ui.Say("Invitation resent")
+
 	return nil
 }

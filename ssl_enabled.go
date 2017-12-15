@@ -2,18 +2,21 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
+
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
 )
 
 // SSLEnabled tells the user whether SSL is enabled for a full domain name.
 func (p *AppCloudPlugin) SSLEnabled(c plugin.CliConnection, domain string, hostname string) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
 	fullDomain := domain
@@ -21,33 +24,33 @@ func (p *AppCloudPlugin) SSLEnabled(c plugin.CliConnection, domain string, hostn
 		fullDomain = strings.Join([]string{hostname, domain}, ".")
 	}
 
-	fmt.Printf("Checking SSL status for %s as %s...\n", cyanBold(fullDomain), cyanBold(username))
+	p.ui.Say("Checking SSL status for %s as %s...", terminal.EntityNameColor(fullDomain), terminal.EntityNameColor(un))
 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve current space")
+		return errors.Wrap(err, "Couldn't retrieve current space")
 	}
 
 	url := fmt.Sprintf("/custom/spaces/%s/certificates", s.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve SSL certificates for space %s", s.Name)
+		return errors.Wrap(err, "Couldn't retrieve SSL certificates for space")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res SSLCertificatesResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response from server")
+		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	if res.ErrorCode != "" {
 		return errors.New(res.Description)
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
-	var enabled bool
+	p.ui.Say(terminal.SuccessColor("OK\n"))
 
+	var enabled bool
 	for _, cert := range res.Resources {
 		if cert.Entity.FullDomainName == fullDomain {
 			enabled = true
@@ -58,7 +61,7 @@ func (p *AppCloudPlugin) SSLEnabled(c plugin.CliConnection, domain string, hostn
 	if !enabled {
 		sharedDomains, err := getSharedDomains(c)
 		if err != nil {
-			return errors.New("Couldn't get shared domains")
+			return errors.Wrap(err, "Couldn't get shared domains")
 		}
 
 		for _, d := range sharedDomains {
@@ -70,9 +73,10 @@ func (p *AppCloudPlugin) SSLEnabled(c plugin.CliConnection, domain string, hostn
 	}
 
 	if enabled {
-		fmt.Printf("SSL is enabled for '%s'\n", fullDomain)
+		p.ui.Say("SSL is enabled for '%s'", fullDomain)
 	} else {
-		fmt.Printf("SSL is not enabled for '%s'\n", fullDomain)
+		p.ui.Say("SSL is not enabled for '%s'", fullDomain)
 	}
+
 	return nil
 }

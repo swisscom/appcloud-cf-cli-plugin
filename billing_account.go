@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
+
 	"net/url"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"code.cloudfoundry.org/cli/plugin"
 )
@@ -45,14 +46,14 @@ func getBillingAccount(c plugin.CliConnection, name string) (BillingAccount, err
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", accURL)
 
 	if err != nil {
-		return BillingAccount{}, fmt.Errorf("Billing Account %s not found", name)
+		return BillingAccount{}, errors.Wrap(err, "Billing Account not found")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res BillingAccountResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return BillingAccount{}, errors.New("Couldn't read JSON response from server")
+		return BillingAccount{}, errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	return res.BillingAccount, nil

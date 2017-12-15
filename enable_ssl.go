@@ -2,18 +2,20 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
+
 	"strings"
 
+	"github.com/pkg/errors"
+
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
 )
 
 // EnableSSL installs an existing SSL certificate.
 func (p *AppCloudPlugin) EnableSSL(c plugin.CliConnection, domain string, hostname string) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
 	fullDomain := domain
@@ -21,11 +23,11 @@ func (p *AppCloudPlugin) EnableSSL(c plugin.CliConnection, domain string, hostna
 		fullDomain = strings.Join([]string{hostname, domain}, ".")
 	}
 
-	fmt.Printf("Enabling SSL for %s as %s...\n", cyanBold(fullDomain), cyanBold(username))
+	p.ui.Say("Enabling SSL for %s as %s...", terminal.EntityNameColor(fullDomain), terminal.EntityNameColor(un))
 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve current space")
+		return errors.Wrap(err, "Couldn't retrieve current space")
 	}
 
 	req := SSLCertificateRequest{
@@ -34,28 +36,29 @@ func (p *AppCloudPlugin) EnableSSL(c plugin.CliConnection, domain string, hostna
 	}
 	reqData, err := json.Marshal(req)
 	if err != nil {
-		return errors.New("Couldn't parse JSON data")
+		return errors.Wrap(err, "Couldn't parse JSON data")
 	}
 
 	url := "/custom/certifications/install"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", url, "-d", string(reqData))
 	if err != nil {
-		return fmt.Errorf("Couldn't enable SSL for %s", fullDomain)
+		return errors.Wrap(err, "Couldn't enable SSL for route")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res SSLCertificateResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response from server")
+		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	if res.ErrorCode != "" {
 		return errors.New(res.Description)
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
+	p.ui.Say(terminal.SuccessColor("OK\n"))
 
-	fmt.Println("SSL enabled")
+	p.ui.Say("SSL enabled")
+
 	return nil
 }

@@ -2,46 +2,50 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
+
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
 )
 
 // RestoreBackup creates a backup for a service instance.
 func (p *AppCloudPlugin) RestoreBackup(c plugin.CliConnection, serviceInstanceName string, backupGUID string) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
-	fmt.Printf("Restoring backup on the service instance %s as %s...\n", cyanBold(serviceInstanceName), cyanBold(username))
+	p.ui.Say("Restoring backup on the service instance %s as %s...", terminal.EntityNameColor(serviceInstanceName), terminal.EntityNameColor(un))
 
 	s, err := c.GetService(serviceInstanceName)
 	if err != nil {
-		return fmt.Errorf("Service instance %s not found", serviceInstanceName)
+		return errors.Wrap(err, "Service instance not found")
 	}
 
 	url := fmt.Sprintf("/custom/service_instances/%s/backups/%s/restores", s.Guid, backupGUID)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "POST", url)
 	if err != nil {
-		return fmt.Errorf("Couldn't restore %s on %s", backupGUID, serviceInstanceName)
+		return errors.Wrap(err, "Couldn't restore backup")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res RestoreBackupResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response from server")
+		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	if res.ErrorCode != "" {
 		return errors.New(res.Description)
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
+	p.ui.Say(terminal.SuccessColor("OK\n"))
 
-	fmt.Printf("Restore in progress. Use '%s' to check operation status.\n", yellowBold("cf backups"))
+	p.ui.Say("Restore in progress. Use '%s' to check operation status.", terminal.CommandColor("cf backups"))
+
 	return nil
 }

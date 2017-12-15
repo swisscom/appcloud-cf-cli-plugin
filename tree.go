@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
+	"github.com/pkg/errors"
 )
 
 // TreeResponse is the response of a server to a tree request.
@@ -48,41 +49,41 @@ type TreeService struct {
 
 // Tree renders the org tree for the current user.
 func (p *AppCloudPlugin) Tree(c plugin.CliConnection, depth int) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
-	fmt.Printf("Getting organization tree as %s...\n", cyanBold(username))
+	p.ui.Say("Getting organization tree as %s...", terminal.EntityNameColor(un))
 
 	url := "/custom/organizations"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
-		return errors.New("Couldn't retrieve organization tree")
+		return errors.Wrap(err, "Couldn't retrieve organization tree")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res TreeResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response from server")
+		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
+	p.ui.Say(terminal.SuccessColor("OK\n"))
 
 	orgs := res.Resources
 	if len(orgs) == 0 {
-		fmt.Println("No organizations found")
+		p.ui.Say("No organizations found")
 		return nil
 	}
 
-	renderTree(orgs, depth)
+	renderTree(p.ui, orgs, depth)
 	return nil
 }
 
 // renderTree renders the org tree with a specified level of depth.
-func renderTree(orgs []TreeOrg, depth int) {
-	output := bold("Orgs\n")
+func renderTree(ui terminal.UI, orgs []TreeOrg, depth int) {
+	output := terminal.HeaderColor("Orgs\n")
 
 	for i, o := range orgs {
 		lastOrg := i == len(orgs)-1
@@ -95,9 +96,9 @@ func renderTree(orgs []TreeOrg, depth int) {
 
 		if len(o.Spaces) > 0 && depth > 0 {
 			if lastOrg {
-				output += "    " + bold("Spaces\n")
+				output += "    " + terminal.HeaderColor("Spaces\n")
 			} else {
-				output += "│   " + bold("Spaces\n")
+				output += "│   " + terminal.HeaderColor("Spaces\n")
 			}
 
 			for j, s := range o.Spaces {
@@ -123,9 +124,9 @@ func renderTree(orgs []TreeOrg, depth int) {
 					}
 
 					if lastSpace {
-						output += "    " + bold("Apps\n")
+						output += "    " + terminal.HeaderColor("Apps\n")
 					} else {
-						output += "│   " + bold("Apps\n")
+						output += "│   " + terminal.HeaderColor("Apps\n")
 					}
 
 					for k, a := range s.Applications {
@@ -159,9 +160,9 @@ func renderTree(orgs []TreeOrg, depth int) {
 					}
 
 					if lastSpace {
-						output += "    " + bold("Services\n")
+						output += "    " + terminal.HeaderColor("Services\n")
 					} else {
-						output += "│   " + bold("Services\n")
+						output += "│   " + terminal.HeaderColor("Services\n")
 					}
 
 					for k, si := range s.ServiceInstances {
@@ -190,5 +191,5 @@ func renderTree(orgs []TreeOrg, depth int) {
 		}
 	}
 
-	fmt.Println(output)
+	ui.Say(output)
 }

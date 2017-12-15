@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
+
 	"strings"
 
+	"github.com/pkg/errors"
+
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
 )
 
@@ -18,16 +20,16 @@ type InviteSpaceUserRequest struct {
 
 // InviteSpaceUser invites a user to join an space with a specific set of roles.
 func (p *AppCloudPlugin) InviteSpaceUser(c plugin.CliConnection, invitee string, spaceName string, roles string) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
-	fmt.Printf("Inviting %s to space %s as %s...\n", cyanBold(invitee), cyanBold(spaceName), cyanBold(username))
+	p.ui.Say("Inviting %s to space %s as %s...", terminal.EntityNameColor(invitee), terminal.EntityNameColor(spaceName), terminal.EntityNameColor(un))
 
 	s, err := c.GetSpace(spaceName)
 	if err != nil {
-		return fmt.Errorf("Space %s not found", spaceName)
+		return errors.Wrap(err, "Space not found")
 	}
 
 	args := InviteSpaceUserRequest{
@@ -40,29 +42,30 @@ func (p *AppCloudPlugin) InviteSpaceUser(c plugin.CliConnection, invitee string,
 	}
 	argsData, err := json.Marshal(args)
 	if err != nil {
-		return errors.New("Couldn't parse JSON data")
+		return errors.Wrap(err, "Couldn't parse JSON data")
 	}
 
 	url := "/custom/space_invitations"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "POST", url, "-d", string(argsData))
 
 	if err != nil {
-		return fmt.Errorf("Couldn't invite %s to space %s", invitee, spaceName)
+		return errors.Wrap(err, "Couldn't invite to space")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res InvitationResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return errors.New("Couldn't read JSON response from server")
+		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	if res.Entity.Status != "SENT" && res.Entity.Status != "CONFIRMED" {
-		return fmt.Errorf("Couldn't send invitation. Current status: %s", res.Entity.Status)
+		return errors.Wrap(err, "Couldn't send invitation")
 	}
 
-	fmt.Print(greenBold("OK\n\n"))
+	p.ui.Say(terminal.SuccessColor("OK\n"))
 
-	fmt.Println("Invitation sent")
+	p.ui.Say("Invitation sent")
+
 	return nil
 }

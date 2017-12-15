@@ -2,54 +2,56 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
 )
 
 // SSLCertificates Lists available SSL certificates
 func (p *AppCloudPlugin) SSLCertificates(c plugin.CliConnection) error {
-	username, err := c.Username()
+	un, err := c.Username()
 	if err != nil {
-		username = "you"
+		return errors.Wrap(err, "Couldn't get your username")
 	}
 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
-		return fmt.Errorf("Couldn't retrieve current space")
+		return errors.Wrap(err, "Couldn't get current space")
 	}
 
-	fmt.Printf("Getting SSL certificates for space %s as %s...\n", cyanBold(s.Name), cyanBold(username))
+	p.ui.Say("Getting SSL certificates for space %s as %s...", terminal.EntityNameColor(s.Name), terminal.EntityNameColor(un))
 
 	url := fmt.Sprintf("/custom/spaces/%s/certificates", s.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
-		return fmt.Errorf("Couldn't get certificates for space %s", s.Name)
+		return errors.Wrap(err, "Couldn't get SSL certificates")
 	}
 
 	resString := strings.Join(resLines, "")
 	var res SSLCertificatesResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return fmt.Errorf("Couldn't read JSON response from server")
+		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	if res.ErrorCode != "" {
 		return errors.New(res.Description)
 	}
 
-	fmt.Println(greenBold("OK\n\n"))
+	p.ui.Say(terminal.SuccessColor("OK\n"))
 
 	if len(res.Resources) > 0 {
-		table := NewTable([]string{"full domain name", "status"})
+		table := p.ui.Table([]string{"full domain name", "status"})
 		for _, cert := range res.Resources {
 			table.Add(cert.Entity.FullDomainName, formatStatus(cert.Entity.Status))
 		}
 		table.Print()
 	} else {
-		fmt.Println("No SSL certificates found")
+		p.ui.Say("No SSL certificates found")
 	}
 
 	return nil

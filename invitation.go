@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/plugin"
+	"github.com/pkg/errors"
 )
 
 // Invitation is an invitation a user received to join a specific entity.
@@ -73,14 +73,14 @@ func getAllInvitations(c plugin.CliConnection) ([]Invitation, error) {
 		url := fmt.Sprintf("/custom/%s_invitations", t)
 		resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 		if err != nil {
-			return []Invitation{}, fmt.Errorf("Couldn't retrieve %s invitations", t)
+			return []Invitation{}, errors.Wrap(err, "Couldn't retrieve invitations")
 		}
 
 		resString := strings.Join(resLines, "")
 		var res InvitationsResponse
 		err = json.Unmarshal([]byte(resString), &res)
 		if err != nil {
-			return []Invitation{}, errors.New("Couldn't read JSON response from server")
+			return []Invitation{}, errors.Wrap(err, "Couldn't read JSON response from server")
 		}
 
 		if res.ErrorCode != "" {

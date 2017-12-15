@@ -1,14 +1,18 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
 	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/trace"
 	"code.cloudfoundry.org/cli/plugin"
 )
 
 // AppCloudPlugin is the Swisscom Application Cloud cf CLI plugin.
-type AppCloudPlugin struct{}
+type AppCloudPlugin struct {
+	ui terminal.UI
+}
 
 // GetMetadata retrieves the metadata for the plugin.
 func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
@@ -153,7 +157,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route",
+						"-hostname, -n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -163,7 +167,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "revoke-ssl-certificate DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route",
+						"-hostname, -n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -173,7 +177,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "enable-ssl DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route",
+						"-hostname, -n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -183,7 +187,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "disable-ssl DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route",
+						"-hostname, -n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -193,7 +197,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "ssl-enabled DOMAIN [--hostname HOSTNAME]",
 					Options: map[string]string{
-						"--hostname, n": "Hostname for the HTTP route",
+						"-hostname, -n": "Hostname for the HTTP route",
 					},
 				},
 			},
@@ -205,7 +209,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "tree [--depth DEPTH]",
 					Options: map[string]string{
-						"--depth, d": "Depth of the tree output (0: orgs, 1: spaces, 2: apps and service instances)",
+						"--depth, -d": "Depth of the tree output (0: orgs, 1: spaces, 2: apps and service instances)",
 					},
 				},
 			},
@@ -226,33 +230,36 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) {
 	var err error
 
+	traceLogger := trace.NewLogger(os.Stdout, true, os.Getenv("CF_TRACE"), "")
+	p.ui = terminal.NewUI(os.Stdin, os.Stdout, terminal.NewTeePrinter(os.Stdout), traceLogger)
+
 	switch args[0] {
 
 	// Backups
 	case "backups":
 		if len(args) != 2 {
-			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
+			p.ui.Say("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
 			return
 		}
 
 		err = p.Backups(cliConnection, args[1])
 	case "create-backup":
 		if len(args) != 2 {
-			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
+			p.ui.Say("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
 			return
 		}
 
 		err = p.CreateBackup(cliConnection, args[1])
 	case "restore-backup":
 		if len(args) != 3 {
-			fmt.Println("Incorrect Usage: the required arguments SERVICE_INSTANCE and/or BACKUP_GUID were not provided")
+			p.ui.Say("Incorrect Usage: the required arguments SERVICE_INSTANCE and/or BACKUP_GUID were not provided")
 			return
 		}
 
 		err = p.RestoreBackup(cliConnection, args[1], args[2])
 	case "delete-backup":
 		if len(args) != 3 {
-			fmt.Println("Incorrect Usage: the required arguments SERVICE_INSTANCE and/or BACKUP_GUID were not provided")
+			p.ui.Say("Incorrect Usage: the required arguments SERVICE_INSTANCE and/or BACKUP_GUID were not provided")
 			return
 		}
 
@@ -263,14 +270,14 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		err = p.Invitations(cliConnection)
 	case "accept-invitation":
 		if len(args) != 2 {
-			fmt.Println("Incorrect Usage: the required argument INVITATION_GUID was not provided")
+			p.ui.Say("Incorrect Usage: the required argument INVITATION_GUID was not provided")
 			return
 		}
 
 		err = p.AcceptInvitation(cliConnection, args[1])
 	case "decline-invitation":
 		if len(args) != 2 {
-			fmt.Println("Incorrect Usage: the required argument INVITATION_GUID was not provided")
+			p.ui.Say("Incorrect Usage: the required argument INVITATION_GUID was not provided")
 			return
 		}
 
@@ -279,61 +286,61 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	// Send invitations
 	case "billing-account-invitations":
 		if len(args) != 2 {
-			fmt.Println("Incorrect Usage: the required argument BILLING_ACCOUNT was not provided")
+			p.ui.Say("Incorrect Usage: the required argument BILLING_ACCOUNT was not provided")
 			return
 		}
 
 		err = p.BillingAccountInvitations(cliConnection, args[1])
 	case "org-invitations":
 		if len(args) != 2 {
-			fmt.Println("Incorrect Usage: the required argument ORG was not provided")
+			p.ui.Say("Incorrect Usage: the required argument ORG was not provided")
 			return
 		}
 
 		err = p.OrgInvitations(cliConnection, args[1])
 	case "space-invitations":
 		if len(args) != 2 {
-			fmt.Println("Incorrect Usage: the required argument SPACE was not provided")
+			p.ui.Say("Incorrect Usage: the required argument SPACE was not provided")
 			return
 		}
 
 		err = p.SpaceInvitations(cliConnection, args[1])
 	case "invite-billing-account-user":
 		if len(args) != 3 {
-			fmt.Println("Incorrect Usage: the required arguments USERNAME and/or BILLING_ACCOUNT were not provided")
+			p.ui.Say("Incorrect Usage: the required arguments USERNAME and/or BILLING_ACCOUNT were not provided")
 			return
 		}
 
 		err = p.InviteBillingAccountUser(cliConnection, args[1], args[2])
 	case "invite-org-user":
 		if len(args) != 4 {
-			fmt.Println("Incorrect Usage: the required arguments USERNAME, ORG and/or ROLES were not provided")
+			p.ui.Say("Incorrect Usage: the required arguments USERNAME, ORG and/or ROLES were not provided")
 			return
 		}
 
 		err = p.InviteOrgUser(cliConnection, args[1], args[2], args[3])
 	case "invite-space-user":
 		if len(args) != 4 {
-			fmt.Println("Incorrect Usage: the required arguments USERNAME, SPACE and/or ROLES were not provided")
+			p.ui.Say("Incorrect Usage: the required arguments USERNAME, SPACE and/or ROLES were not provided")
 			return
 		}
 
 		err = p.InviteSpaceUser(cliConnection, args[1], args[2], args[3])
 	case "resend-billing-account-invitation":
 		if len(args) != 3 {
-			fmt.Println("Incorrect Usage: the required arguments USERNAME and/org BILLING_ACCOUNT were not provided")
+			p.ui.Say("Incorrect Usage: the required arguments USERNAME and/org BILLING_ACCOUNT were not provided")
 			return
 		}
 		err = p.ResendBillingAccountInvitation(cliConnection, args[1], args[2])
 	case "resend-org-invitation":
 		if len(args) != 3 {
-			fmt.Println("Incorrect Usage: the required arguments USERNAME and/org ORG were not provided")
+			p.ui.Say("Incorrect Usage: the required arguments USERNAME and/org ORG were not provided")
 			return
 		}
 		err = p.ResendOrgInvitation(cliConnection, args[1], args[2])
 	case "resend-space-invitation":
 		if len(args) != 3 {
-			fmt.Println("Incorrect Usage: the required arguments USERNAME and/or SPACE were not provided")
+			p.ui.Say("Incorrect Usage: the required arguments USERNAME and/or SPACE were not provided")
 			return
 		}
 		err = p.ResendSpaceInvitation(cliConnection, args[1], args[2])
@@ -343,90 +350,90 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 		err = p.SSLCertificates(cliConnection)
 	case "create-ssl-certificate":
 		if len(args) < 2 || len(args) > 4 {
-			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			p.ui.Say("Incorrect Usage: the required argument DOMAIN was not provided")
 			return
 		}
 
 		var fc flags.FlagContext
 		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
-			fmt.Println("Incorrect Usage: Organization option must be a string")
+			p.ui.Say("Incorrect Usage: Organization option must be a string")
 			return
 		}
 
-		err = p.CreateSSLCertificate(cliConnection, args[1], fc.String("n"))
+		err = p.CreateSSLCertificate(cliConnection, args[1], fc.String("hostname"))
 	case "revoke-ssl-certificate":
 		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			p.ui.Say("Incorrect Usage: the required argument DOMAIN was not provided")
 			return
 		}
 
 		var fc flags.FlagContext
 		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
-			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
+			p.ui.Say("Incorrect Usage: HOSTNAME must be a string")
 			return
 		}
 
-		err = p.RevokeSSLCertificate(cliConnection, args[1], fc.String("n"))
+		err = p.RevokeSSLCertificate(cliConnection, args[1], fc.String("hostname"))
 	case "enable-ssl":
 		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			p.ui.Say("Incorrect Usage: the required argument DOMAIN was not provided")
 			return
 		}
 
 		var fc flags.FlagContext
 		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
-			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
+			p.ui.Say("Incorrect Usage: HOSTNAME must be a string")
 			return
 		}
 
-		err = p.EnableSSL(cliConnection, args[1], fc.String("n"))
+		err = p.EnableSSL(cliConnection, args[1], fc.String("hostname"))
 	case "disable-ssl":
 		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			p.ui.Say("Incorrect Usage: the required argument DOMAIN was not provided")
 			return
 		}
 
 		var fc flags.FlagContext
 		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
-			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
+			p.ui.Say("Incorrect Usage: HOSTNAME must be a string")
 			return
 		}
 
-		err = p.DisableSSL(cliConnection, args[1], fc.String("n"))
+		err = p.DisableSSL(cliConnection, args[1], fc.String("hostname"))
 	case "ssl-enabled":
 		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument DOMAIN was not provided")
+			p.ui.Say("Incorrect Usage: the required argument DOMAIN was not provided")
 			return
 		}
 
 		var fc flags.FlagContext
 		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
-			fmt.Println("Incorrect Usage: HOSTNAME must be a string")
+			p.ui.Say("Incorrect Usage: HOSTNAME must be a string")
 			return
 		}
 
-		err = p.SSLEnabled(cliConnection, args[1], fc.String("n"))
+		err = p.SSLEnabled(cliConnection, args[1], fc.String("hostname"))
 
 	// Tree
 	case "tree":
 		var fc flags.FlagContext
 		fc, err = parseTreeArgs(args)
 		if err != nil {
-			fmt.Println("Incorrect Usage: DEPTH must be an integer")
+			p.ui.Say("Incorrect Usage: DEPTH must be an integer")
 			return
 		}
 
-		err = p.Tree(cliConnection, fc.Int("d"))
+		err = p.Tree(cliConnection, fc.Int("depth"))
 
 	// Service events
 	case "service-events":
 		if len(args) < 2 {
-			fmt.Println("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
+			p.ui.Say("Incorrect Usage: the required argument SERVICE_INSTANCE was not provided")
 			return
 		}
 
@@ -434,8 +441,7 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	}
 
 	if err != nil {
-		fmt.Print(redBold("FAILED\n\n"))
-		fmt.Println(err.Error())
+		p.ui.Failed(err.Error())
 	}
 }
 
@@ -456,6 +462,9 @@ func parseTreeArgs(args []string) (flags.FlagContext, error) {
 	fc := flags.New()
 	fc.NewIntFlagWithDefault("depth", "d", "Level of output", 2)
 	err := fc.Parse(args...)
+	if err != nil {
+		return nil, err
+	}
 
 	return fc, err
 }

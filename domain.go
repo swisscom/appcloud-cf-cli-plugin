@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/plugin"
+	"github.com/pkg/errors"
 )
 
 // Domain is a Cloud Foundry domain.
@@ -35,7 +35,7 @@ func getSharedDomains(c plugin.CliConnection) ([]Domain, error) {
 	var res DomainsResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return []Domain{}, errors.New("Couldn't read JSON response from server")
+		return []Domain{}, errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
 	if res.ErrorCode != "" {
