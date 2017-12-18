@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"strings"
 
@@ -54,7 +55,7 @@ func (p *AppCloudPlugin) CreateSSLCertificate(c plugin.CliConnection, domain str
 	}
 
 	if res.ErrorCode != "" {
-		return errors.New(res.Description)
+		return fmt.Errorf("Error response from server: %s", res.Description)
 	}
 
 	p.ui.Say(terminal.SuccessColor("OK\n"))

@@ -40,7 +40,7 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, invitee str
 	}
 
 	if res.ErrorCode != "" {
-		return errors.New(res.Description)
+		return fmt.Errorf("Error response from server: %s", res.Description)
 	}
 
 	for _, i := range res.Resources {
@@ -56,7 +56,7 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, invitee str
 			}
 
 			if invRes.ErrorCode != "" {
-				return errors.New(invRes.Description)
+				return fmt.Errorf("Error response from server: %s", invRes.Description)
 			}
 		}
 	}

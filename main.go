@@ -441,7 +441,9 @@ func (p *AppCloudPlugin) Run(cliConnection plugin.CliConnection, args []string) 
 	}
 
 	if err != nil {
-		p.ui.Failed(err.Error())
+		p.ui.Say("\n")
+		p.ui.Say(err.Error())
+		p.ui.Say(terminal.FailureColor("FAILED"))
 	}
 }
 

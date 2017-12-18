@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"strings"
 
@@ -40,7 +41,7 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, domain str
 	}
 
 	url := "/custom/certifications/revoke"
-	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "DELETE", url, "-d", string(reqData))
+	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", url, "-d", string(reqData))
 	if err != nil {
 		return errors.Wrap(err, "Couldn't revoke SSL certificate for route")
 	}
@@ -53,7 +54,7 @@ func (p *AppCloudPlugin) RevokeSSLCertificate(c plugin.CliConnection, domain str
 	}
 
 	if res.ErrorCode != "" {
-		return errors.New(res.Description)
+		return fmt.Errorf("Error response from server: %s", res.Description)
 	}
 
 	p.ui.Say(terminal.SuccessColor("OK\n"))

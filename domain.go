@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/plugin"
@@ -39,7 +40,7 @@ func getSharedDomains(c plugin.CliConnection) ([]Domain, error) {
 	}
 
 	if res.ErrorCode != "" {
-		return []Domain{}, errors.New(res.Description)
+		return []Domain{}, fmt.Errorf("Error response from server: %s", res.Description)
 	}
 
 	return res.Resources, nil

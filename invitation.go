@@ -84,7 +84,7 @@ func getAllInvitations(c plugin.CliConnection) ([]Invitation, error) {
 		}
 
 		if res.ErrorCode != "" {
-			return []Invitation{}, errors.New(res.Description)
+			return []Invitation{}, fmt.Errorf("Error response from server: %s", res.Description)
 		}
 
 		for _, i := range res.Resources {
