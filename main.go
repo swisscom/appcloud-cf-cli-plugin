@@ -21,7 +21,7 @@ func (p *AppCloudPlugin) GetMetadata() plugin.PluginMetadata {
 		Version: plugin.VersionType{
 			Major: 0,
 			Minor: 1,
-			Build: 0,
+			Build: 1,
 		},
 		Commands: []plugin.Command{
 
