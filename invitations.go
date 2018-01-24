@@ -28,7 +28,10 @@ func (p *AppCloudPlugin) Invitations(c plugin.CliConnection) error {
 			entityType, entityName := invitationEntityTypeAndName(inv)
 			table.Add(inv.Metadata.GUID, formatEntityType(entityType), entityName)
 		}
-		table.Print()
+		err := table.Print()
+		if err != nil {
+			return errors.Wrap(err, "Couldn't print table")
+		}
 	} else {
 		p.ui.Say("No invitations found")
 	}

@@ -47,6 +47,9 @@ func (p *AppCloudPlugin) ResendSpaceInvitation(c plugin.CliConnection, invitee s
 		if i.Entity.Invitee == invitee {
 			invURL := fmt.Sprintf("/custom/space_invitations/%s/resend", i.Metadata.GUID)
 			invResLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "POST", invURL)
+			if err != nil {
+				return errors.Wrap(err, "Couldn't resent space invitation")
+			}
 			invResString := strings.Join(invResLines, "")
 			var invRes InvitationResponse
 

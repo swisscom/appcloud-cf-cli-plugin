@@ -47,6 +47,9 @@ func (p *AppCloudPlugin) ResendBillingAccountInvitation(c plugin.CliConnection, 
 		if i.Entity.Invitee == invitee {
 			invURL := fmt.Sprintf("/custom/account_invitations/%s/resend", i.Metadata.GUID)
 			invResLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "POST", invURL)
+			if err != nil {
+				return errors.Wrap(err, "Couldn't resend billing account invitation")
+			}
 			invResString := strings.Join(invResLines, "")
 			var invRes InvitationResponse
 

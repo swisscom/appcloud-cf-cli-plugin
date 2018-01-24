@@ -51,7 +51,10 @@ func (p *AppCloudPlugin) SpaceInvitations(c plugin.CliConnection, spaceName stri
 		for _, inv := range res.Resources {
 			table.Add(inv.Entity.Invitee, strings.Join(inv.Entity.Roles, ","), inv.Entity.Status)
 		}
-		table.Print()
+		err := table.Print()
+		if err != nil {
+			return errors.Wrap(err, "Couldn't print table")
+		}
 	} else {
 		p.ui.Say("No invitations found")
 	}

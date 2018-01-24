@@ -47,6 +47,9 @@ func (p *AppCloudPlugin) ResendOrgInvitation(c plugin.CliConnection, invitee str
 		if i.Entity.Invitee == invitee {
 			invURL := fmt.Sprintf("/custom/organization_invitations/%s/resend", i.Metadata.GUID)
 			invResLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "POST", invURL)
+			if err != nil {
+				return errors.Wrap(err, "Couldn't resend org invitation")
+			}
 			invResString := strings.Join(invResLines, "")
 			var invRes InvitationResponse
 

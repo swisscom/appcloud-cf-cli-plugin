@@ -52,7 +52,10 @@ func (p *AppCloudPlugin) ServiceEvents(c plugin.CliConnection, serviceInstanceNa
 		for _, e := range events {
 			table.Add(e.Metadata.CreatedAt.Format(time.RFC3339), e.Entity.Type, e.Entity.ActorName)
 		}
-		table.Print()
+		err := table.Print()
+		if err != nil {
+			return errors.Wrap(err, "Couldn't print table")
+		}
 	} else {
 		p.ui.Say("No events found")
 	}

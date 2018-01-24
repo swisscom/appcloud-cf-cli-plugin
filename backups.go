@@ -62,7 +62,10 @@ func (p *AppCloudPlugin) Backups(c plugin.CliConnection, serviceInstanceName str
 
 			table.Add(b.Metadata.CreatedAt.Format(time.RFC3339), b.Metadata.GUID, formatStatus(overallStatus))
 		}
-		table.Print()
+		err := table.Print()
+		if err != nil {
+			return errors.Wrap(err, "Couldn't print table")
+		}
 	} else {
 		p.ui.Say("No backups found")
 	}

@@ -4,12 +4,8 @@ package main
 type SSLCertificate struct {
 	Metadata CFMetadata `json:"metadata"`
 	Entity   struct {
-		SpaceID          string `json:"space_id"`
-		FullDomainName   string `json:"full_domain_name"`
-		Status           string `json:"status"`
-		NotValidBefore   string `json:"not_valid_before"`
-		NotValidAfter    string `json:"not_valid_after"`
-		AutomaticRenewal string `json:"automatic_renewal"`
+		FullDomainName string `json:"full_domain_name"`
+		Status         string `json:"status"`
 	} `json:"entity"`
 }
 

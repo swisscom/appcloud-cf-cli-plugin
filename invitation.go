@@ -9,14 +9,18 @@ import (
 	"github.com/pkg/errors"
 )
 
+// These are the different statuses an invitation can have.
+const (
+	StatusSent      = "SENT"
+	StatusConfirmed = "CONFIRMED"
+)
+
 // Invitation is an invitation a user received to join a specific entity.
 type Invitation struct {
 	Metadata CFMetadata `json:"metadata"`
 	Entity   struct {
 		Invitee          string   `json:"invitee"`
 		Roles            []string `json:"roles"`
-		ActorUsername    string   `json:"actor_username"`
-		ActorUserID      string   `json:"actor_user_id"`
 		AccountID        string   `json:"account_id"`
 		AccountName      string   `json:"account_name"`
 		OrganizationID   string   `json:"organization_id"`
@@ -87,9 +91,7 @@ func getAllInvitations(c plugin.CliConnection) ([]Invitation, error) {
 			return []Invitation{}, fmt.Errorf("Error response from server: %s", res.Description)
 		}
 
-		for _, i := range res.Resources {
-			invitations = append(invitations, i)
-		}
+		invitations = append(invitations, res.Resources...)
 	}
 
 	return invitations, nil

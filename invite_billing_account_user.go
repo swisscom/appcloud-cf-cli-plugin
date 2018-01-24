@@ -55,7 +55,7 @@ func (p *AppCloudPlugin) InviteBillingAccountUser(c plugin.CliConnection, invite
 		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
-	if res.Entity.Status != "SENT" && res.Entity.Status != "CONFIRMED" {
+	if res.Entity.Status != StatusSent && res.Entity.Status != StatusConfirmed {
 		return errors.Wrap(err, "Couldn't send invitation")
 	}
 

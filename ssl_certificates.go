@@ -49,7 +49,10 @@ func (p *AppCloudPlugin) SSLCertificates(c plugin.CliConnection) error {
 		for _, cert := range res.Resources {
 			table.Add(cert.Entity.FullDomainName, formatStatus(cert.Entity.Status))
 		}
-		table.Print()
+		err := table.Print()
+		if err != nil {
+			return errors.Wrap(err, "Couldn't print table")
+		}
 	} else {
 		p.ui.Say("No SSL certificates found")
 	}

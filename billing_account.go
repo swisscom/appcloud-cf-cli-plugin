@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"net/url"
 	"strings"
@@ -14,24 +15,8 @@ import (
 // BillingAccount is an entity of the Swisscom Application Cloud which handles billing.
 type BillingAccount struct {
 	Metadata struct {
-		GUID      string `json:"guid"`
-		URL       string `json:"url"`
-		CreatedAt string `json:"created_at"`
-		UpdatedAt string `json:"updated_at"`
+		GUID string `json:"guid"`
 	} `json:"metadata"`
-	Entity struct {
-		Status           string `json:"status"`
-		StatusReasonData struct {
-			Code        string `json:"code"`
-			Description string `json:"description"`
-		} `json:"status_reason_data"`
-		Prohibited        bool   `json:"prohibited"`
-		Name              string `json:"name"`
-		CustomerNumber    string `json:"customer_number"`
-		CustomerType      string `json:"customer_type"`
-		OrganizationCount int    `json:"organization_count"`
-		MaxOrganizations  int    `json:"max_organizations"`
-	} `json:"entity"`
 }
 
 // BillingAccountResponse is a response from the server to a billing account request.
@@ -42,7 +27,7 @@ type BillingAccountResponse struct {
 
 // getBillingAccount retrieves a billing account by name.
 func getBillingAccount(c plugin.CliConnection, name string) (BillingAccount, error) {
-	accURL := url.QueryEscape("/custom/accounts?q=name:%s")
+	accURL := url.QueryEscape(fmt.Sprintf("/custom/accounts?q=name:%s", name))
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", accURL)
 
 	if err != nil {

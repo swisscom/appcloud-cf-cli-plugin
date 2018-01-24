@@ -10,6 +10,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+// These are strings used to create the tree structure.
+const (
+	indent           = "    "
+	indentWithBranch = "│   "
+)
+
 // TreeResponse is the response of a server to a tree request.
 type TreeResponse struct {
 	Resources []TreeOrg `json:"resources"`
@@ -96,18 +102,18 @@ func renderTree(ui terminal.UI, orgs []TreeOrg, depth int) {
 
 		if len(o.Spaces) > 0 && depth > 0 {
 			if lastOrg {
-				output += "    " + terminal.HeaderColor("Spaces\n")
+				output += indent + terminal.HeaderColor("Spaces\n")
 			} else {
-				output += "│   " + terminal.HeaderColor("Spaces\n")
+				output += indentWithBranch + terminal.HeaderColor("Spaces\n")
 			}
 
 			for j, s := range o.Spaces {
 				lastSpace := j == len(o.Spaces)-1
 
 				if lastOrg {
-					output += "    "
+					output += indent
 				} else {
-					output += "│   "
+					output += indentWithBranch
 				}
 
 				if lastSpace {
@@ -118,30 +124,30 @@ func renderTree(ui terminal.UI, orgs []TreeOrg, depth int) {
 
 				if len(s.Applications) > 0 && depth > 1 {
 					if lastOrg {
-						output += "    "
+						output += indent
 					} else {
-						output += "│   "
+						output += indentWithBranch
 					}
 
 					if lastSpace {
-						output += "    " + terminal.HeaderColor("Apps\n")
+						output += indent + terminal.HeaderColor("Apps\n")
 					} else {
-						output += "│   " + terminal.HeaderColor("Apps\n")
+						output += indentWithBranch + terminal.HeaderColor("Apps\n")
 					}
 
 					for k, a := range s.Applications {
 						lastApp := k == len(s.Applications)-1
 
 						if lastOrg {
-							output += "    "
+							output += indent
 						} else {
-							output += "│   "
+							output += indentWithBranch
 						}
 
 						if lastSpace {
-							output += "    "
+							output += indent
 						} else {
-							output += "│   "
+							output += indentWithBranch
 						}
 
 						if lastApp {
@@ -154,30 +160,30 @@ func renderTree(ui terminal.UI, orgs []TreeOrg, depth int) {
 
 				if len(s.ServiceInstances) > 0 && depth > 1 {
 					if lastOrg {
-						output += "    "
+						output += indent
 					} else {
-						output += "│   "
+						output += indentWithBranch
 					}
 
 					if lastSpace {
-						output += "    " + terminal.HeaderColor("Services\n")
+						output += indent + terminal.HeaderColor("Services\n")
 					} else {
-						output += "│   " + terminal.HeaderColor("Services\n")
+						output += indentWithBranch + terminal.HeaderColor("Services\n")
 					}
 
 					for k, si := range s.ServiceInstances {
 						lastService := k == len(s.ServiceInstances)-1
 
 						if lastOrg {
-							output += "    "
+							output += indent
 						} else {
-							output += "│   "
+							output += indentWithBranch
 						}
 
 						if lastSpace {
-							output += "    "
+							output += indent
 						} else {
-							output += "│   "
+							output += indentWithBranch
 						}
 
 						if lastService {
