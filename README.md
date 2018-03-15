@@ -1,6 +1,7 @@
 # Swisscom Application Cloud cf CLI Plugin
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/swisscom/appcloud-cf-cli-plugin)](https://goreportcard.com/report/github.com/swisscom/appcloud-cf-cli-plugin)
+[![Go Report Card](https://goreportcard.com/badge/github.com/swisscom/appcloud-cf-cli-plugin?style=flat-square)](https://goreportcard.com/report/github.com/swisscom/appcloud-cf-cli-plugin)
+[![Release](https://img.shields.io/github/release/swisscom/appcloud-cf-cli-plugin.svg?style=flat-square)](https://github.com/swisscom/appcloud-cf-cli-plugin/releases/latest)<Paste>
 
 The official [cf CLI](https://github.com/cloudfoundry/cli) plugin for the [Swisscom Application Cloud](https://developer.swisscom.com) gives you access to all the additional features of the App Cloud.
 
