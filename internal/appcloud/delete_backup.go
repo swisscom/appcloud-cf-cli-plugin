@@ -31,14 +31,16 @@ func (p *Plugin) DeleteBackup(c plugin.CliConnection, serviceInstanceName string
 	}
 
 	resString := strings.Join(resLines, "")
-	var res ServerResponseError
-	err = json.Unmarshal([]byte(resString), &res)
-	if err != nil {
-		return errors.Wrap(err, "Couldn't read JSON response from server")
-	}
+	if resString != "" {
+		var res ServerResponseError
+		err = json.Unmarshal([]byte(resString), &res)
+		if err != nil {
+			return errors.Wrap(err, "Couldn't read JSON response from server")
+		}
 
-	if res.ErrorCode != "" {
-		return fmt.Errorf("Error response from server: %s", res.Description)
+		if res.ErrorCode != "" {
+			return fmt.Errorf("Error response from server: %s", res.Description)
+		}
 	}
 
 	p.ui.Say(terminal.SuccessColor("OK\n"))
