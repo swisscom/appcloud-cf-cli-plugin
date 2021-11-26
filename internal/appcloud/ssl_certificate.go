@@ -1,6 +1,6 @@
 package appcloud
 
-// SSLCertificate is a SSL certificate which can be used to secure routes.
+// SSLCertificate is an SSL certificate which can be used to secure routes.
 type SSLCertificate struct {
 	Metadata CFMetadata `json:"metadata"`
 	Entity   struct {
@@ -9,7 +9,7 @@ type SSLCertificate struct {
 	} `json:"entity"`
 }
 
-// SSLCertificateRequest is the request to create a SSL certificate.
+// SSLCertificateRequest is the request to create an SSL certificate.
 type SSLCertificateRequest struct {
 	SpaceID        string `json:"space_id"`
 	FullDomainName string `json:"full_domain_name"`

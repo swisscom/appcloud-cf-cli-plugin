@@ -153,7 +153,7 @@ func (p *Plugin) GetMetadata() plugin.PluginMetadata {
 			},
 			{
 				Name:     "create-ssl-certificate",
-				HelpText: "Create and enable a SSL certificate for a route",
+				HelpText: "Create and enable an SSL certificate for a route",
 				UsageDetails: plugin.Usage{
 					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME] [--key-type KEY_TYPE]",
 					Options: map[string]string{
@@ -448,7 +448,7 @@ func (p *Plugin) Run(cliConnection plugin.CliConnection, args []string) {
 	}
 }
 
-// parseSSLCertificateArgs parses the arguments passed to a ssl certificate command.
+// parseSSLCertificateArgs parses the arguments passed to an ssl certificate command.
 func parseSSLCertificateArgs(args []string) (flags.FlagContext, error) {
 	fc := flags.New()
 	fc.NewStringFlag("hostname", "n", "Hostname for the HTTP route")
