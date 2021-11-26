@@ -13,6 +13,7 @@ type SSLCertificate struct {
 type SSLCertificateRequest struct {
 	SpaceID        string `json:"space_id"`
 	FullDomainName string `json:"full_domain_name"`
+	KeyType        string `json:"key_type,omitempty"`
 }
 
 // SSLCertificateResponse is the response from the server from a create certificate call

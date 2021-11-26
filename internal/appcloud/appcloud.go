@@ -155,9 +155,10 @@ func (p *Plugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "create-ssl-certificate",
 				HelpText: "Create and enable an SSL certificate for a route",
 				UsageDetails: plugin.Usage{
-					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME]",
+					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME] [--key-type KEY_TYPE]",
 					Options: map[string]string{
 						"-hostname, -n": "Hostname for the HTTP route",
+						"-key-type, -kt": "Key type for the certificate (e.g. RSA, ECDSA)",
 					},
 				},
 			},
@@ -357,11 +358,11 @@ func (p *Plugin) Run(cliConnection plugin.CliConnection, args []string) {
 		var fc flags.FlagContext
 		fc, err = parseSSLCertificateArgs(args)
 		if err != nil {
-			p.ui.Say("Incorrect Usage: Organization option must be a string")
+			p.ui.Say(err.Error())
 			return
 		}
 
-		err = p.CreateSSLCertificate(cliConnection, args[1], fc.String("hostname"))
+		err = p.CreateSSLCertificate(cliConnection, args[1], fc.String("hostname"), fc.String("key-type"))
 	case "revoke-ssl-certificate":
 		if len(args) < 2 {
 			p.ui.Say("Incorrect Usage: the required argument DOMAIN was not provided")
@@ -447,10 +448,11 @@ func (p *Plugin) Run(cliConnection plugin.CliConnection, args []string) {
 	}
 }
 
-// parseSSLCertificateArgs parses the arguments passed to a ssl certificate command.
+// parseSSLCertificateArgs parses the arguments passed to an ssl certificate command.
 func parseSSLCertificateArgs(args []string) (flags.FlagContext, error) {
 	fc := flags.New()
 	fc.NewStringFlag("hostname", "n", "Hostname for the HTTP route")
+	fc.NewStringFlag("key-type", "kt", "Key type for the certificate")
 	err := fc.Parse(args...)
 	if err != nil {
 		return nil, err

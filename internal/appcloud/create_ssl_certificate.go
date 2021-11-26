@@ -11,7 +11,7 @@ import (
 )
 
 // CreateSSLCertificate creates a new SSL certificate for an FQDN.
-func (p *Plugin) CreateSSLCertificate(c plugin.CliConnection, domain string, hostname string) error {
+func (p *Plugin) CreateSSLCertificate(c plugin.CliConnection, domain string, hostname string, keyType string) error {
 	un, err := c.Username()
 	if err != nil {
 		return errors.Wrap(err, "Couldn't get your username")
@@ -32,6 +32,7 @@ func (p *Plugin) CreateSSLCertificate(c plugin.CliConnection, domain string, hos
 	req := SSLCertificateRequest{
 		SpaceID:        s.Guid,
 		FullDomainName: fullDomain,
+		KeyType:        keyType,
 	}
 	reqData, err := json.Marshal(req)
 	if err != nil {
