@@ -18,14 +18,15 @@ type BillingAccount struct {
 }
 
 // BillingAccountResponse is a response from the server to a billing account request.
-type BillingAccountResponse struct {
-	BillingAccount
+type BillingAccountsResponse struct {
+	BillingAccounts []BillingAccount `json:"resources"`
 	ServerResponseError
 }
 
-// getBillingAccount retrieves a billing account by name.
+// getBillingAccount retrieves a billing account by name or number.
 func getBillingAccount(c plugin.CliConnection, name string) (BillingAccount, error) {
-	accURL := url.QueryEscape(fmt.Sprintf("/custom/accounts?q=name:%s", name))
+	expression := url.QueryEscape("name_number:" + name)
+	accURL := fmt.Sprintf("/custom/accounts?q=%s", expression)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", accURL)
 
 	if err != nil {
@@ -33,11 +34,17 @@ func getBillingAccount(c plugin.CliConnection, name string) (BillingAccount, err
 	}
 
 	resString := strings.Join(resLines, "")
-	var res BillingAccountResponse
+	var res BillingAccountsResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
 		return BillingAccount{}, errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
-	return res.BillingAccount, nil
+	if len(res.BillingAccounts) == 0 {
+		return BillingAccount{}, errors.New("Billing account not found")
+	} else if len(res.BillingAccounts) > 1 {
+		return BillingAccount{}, errors.New("Multiple billing accounts found - retry with the account's number or full name")
+	}
+
+	return res.BillingAccounts[0], nil
 }

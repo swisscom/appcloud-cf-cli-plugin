@@ -17,11 +17,11 @@ func (p *Plugin) BillingAccountInvitations(c plugin.CliConnection, billingAccoun
 		return errors.Wrap(err, "Couldn't get your username")
 	}
 
-	p.ui.Say("Gettings invitations to billing account %s as %s...", terminal.EntityNameColor(billingAccountName), terminal.EntityNameColor(un))
+	p.ui.Say("Getting invitations for billing account %s as %s...", terminal.EntityNameColor(billingAccountName), terminal.EntityNameColor(un))
 
 	ba, err := getBillingAccount(c, billingAccountName)
 	if err != nil {
-		return errors.Wrap(err, "Billing account not found")
+		return err
 	}
 
 	url := fmt.Sprintf("/custom/accounts/%s/invitations", ba.Metadata.GUID)
