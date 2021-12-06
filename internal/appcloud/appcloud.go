@@ -102,7 +102,7 @@ func (p *Plugin) GetMetadata() plugin.PluginMetadata {
 			},
 			{
 				Name:     "invite-billing-account-user",
-				HelpText: "Invite a user to a billing account as an 'accountOwner'",
+				HelpText: `Invite a user to a billing account as an 'account owner'. The account can be specified by number (e.g.: F26AADDL00) or full name`,
 				UsageDetails: plugin.Usage{
 					Usage: "invite-org-user USERNAME BILLING_ACCOUNT",
 				},
@@ -157,7 +157,7 @@ func (p *Plugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME] [--key-type KEY_TYPE]",
 					Options: map[string]string{
-						"-hostname, -n": "Hostname for the HTTP route",
+						"-hostname, -n":  "Hostname for the HTTP route",
 						"-key-type, -kt": "Key type for the certificate (e.g. RSA, ECDSA)",
 					},
 				},

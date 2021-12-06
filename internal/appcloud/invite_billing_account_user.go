@@ -27,13 +27,13 @@ func (p *Plugin) InviteBillingAccountUser(c plugin.CliConnection, invitee string
 
 	ba, err := getBillingAccount(c, billingAccountName)
 	if err != nil {
-		return errors.Wrap(err, "Billing Account not found")
+		return err
 	}
 
 	args := InviteBillingAccountUserRequest{
 		Invitee:   invitee,
 		AccountID: ba.Metadata.GUID,
-		Roles:     []string{"accountOwner"},
+		Roles:     []string{"OWNER"},
 	}
 	argsData, err := json.Marshal(args)
 	if err != nil {
