@@ -157,8 +157,8 @@ func (p *Plugin) GetMetadata() plugin.PluginMetadata {
 				UsageDetails: plugin.Usage{
 					Usage: "create-ssl-certificate DOMAIN [--hostname HOSTNAME] [--key-type KEY_TYPE]",
 					Options: map[string]string{
-						"-hostname, -n":  "Hostname for the HTTP route",
-						"-key-type, -kt": "Key type for the certificate (e.g. RSA, ECDSA)",
+						"-hostname, -n": "Hostname for the HTTP route",
+						"-key-type, -k": "Key type for the certificate (e.g. RSA, ECDSA)",
 					},
 				},
 			},
