@@ -108,7 +108,7 @@ github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.13
 ## explicit; go 1.9
 github.com/mattn/go-runewidth
-# github.com/moby/moby v20.10.11+incompatible
+# github.com/moby/moby v20.10.20+incompatible
 ## explicit
 # github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6
 ## explicit; go 1.13
