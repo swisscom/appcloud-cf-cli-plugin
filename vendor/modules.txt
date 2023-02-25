@@ -134,7 +134,7 @@ github.com/vito/go-interact/interact/terminal
 # golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
 ## explicit; go 1.17
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/sys v0.0.0-20211117180635-dee7805ff2e1
+# golang.org/x/sys v0.1.0
 ## explicit; go 1.17
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
