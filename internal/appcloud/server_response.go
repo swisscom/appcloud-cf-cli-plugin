@@ -14,3 +14,13 @@ type ServerResponsePagination struct {
 	PrevURL     string `json:"prev_url"`
 	NextURL     string `json:"next_url"`
 }
+
+type V3ServerResponseError struct {
+	Code   int    `json:"code"`
+	Title  string `json:"title"`
+	Detail string `json:"detail"`
+}
+
+type V3ServerResponseErrors struct {
+	Errors []V3ServerResponseError `json:"errors"`
+}

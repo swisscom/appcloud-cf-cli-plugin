@@ -2,16 +2,16 @@ package appcloud
 
 // EventsResponse is a response from the server to an events call.
 type EventsResponse struct {
-	Resources []Event `json:"resources"`
-	ServerResponsePagination
-	ServerResponseError
+	Resources []V3AuditEvent `json:"resources"`
+	// ServerResponsePagination
+	V3ServerResponseErrors
 }
 
-// Event is a service instance event.
-type Event struct {
-	Metadata CFMetadata `json:"metadata"`
-	Entity   struct {
-		Type      string `json:"type"`
-		ActorName string `json:"actor_name"`
-	} `json:"entity"`
+// V3AuditEvent is a service instance event.
+type V3AuditEvent struct {
+	CreatedAt string `json:"created_at"`
+	Type      string `json:"type"`
+	Actor     struct {
+		Name string `json:"name"`
+	} `json:"actor"`
 }

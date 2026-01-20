@@ -9,38 +9,40 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Domain is a Cloud Foundry domain.
-type Domain struct {
-	Metadata CFMetadata `json:"metadata"`
-	Entity   struct {
-		Name string `json:"name"`
-	} `json:"entity"`
+// V3Domain is a Cloud Foundry domain.
+type V3Domain struct {
+	Name string `json:"name"`
 }
 
-// DomainsResponse is a response from the server to a domains request.
-type DomainsResponse struct {
-	Resources []Domain `json:"resources"`
-	ServerResponsePagination
-	ServerResponseError
+// V3DomainsResponse is a response from the server to a domains request.
+type V3DomainsResponse struct {
+	Resources []V3Domain `json:"resources"`
+	// ServerResponsePagination
+	V3ServerResponseErrors
 }
 
-// getSharedDomains retrieves all shared domains.
-func getSharedDomains(c plugin.CliConnection) ([]Domain, error) {
-	url := "/v2/shared_domains"
+// getOrgDomains retrieves all org domains.
+func getOrgDomains(c plugin.CliConnection) ([]V3Domain, error) {
+	org, err := c.GetCurrentOrg()
+	if err != nil {
+		return []V3Domain{}, err
+	}
+
+	url := fmt.Sprintf("/v3/organizations/%s/domains", org.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
-		return []Domain{}, err
+		return []V3Domain{}, err
 	}
 
 	resString := strings.Join(resLines, "")
-	var res DomainsResponse
+	var res V3DomainsResponse
 	err = json.Unmarshal([]byte(resString), &res)
 	if err != nil {
-		return []Domain{}, errors.Wrap(err, "Couldn't read JSON response from server")
+		return []V3Domain{}, errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
-	if res.ErrorCode != "" {
-		return []Domain{}, fmt.Errorf("Error response from server: %s", res.Description)
+	if len(res.Errors) > 0 {
+		return []V3Domain{}, fmt.Errorf("Error response from server: %s", res.Errors[0].Detail)
 	}
 
 	return res.Resources, nil

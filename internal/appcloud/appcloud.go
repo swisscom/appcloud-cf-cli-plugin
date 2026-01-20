@@ -24,7 +24,6 @@ func (p *Plugin) GetMetadata() plugin.PluginMetadata {
 			Build: 2,
 		},
 		Commands: []plugin.Command{
-
 			// Backups
 			{
 				Name:     "backups",

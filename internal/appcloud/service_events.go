@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
@@ -25,7 +24,7 @@ func (p *Plugin) ServiceEvents(c plugin.CliConnection, serviceInstanceName strin
 		return errors.Wrap(err, "Service instance not found")
 	}
 
-	url := fmt.Sprintf("/v2/events?q=actee:%s", s.Guid)
+	url := fmt.Sprintf("/v3/audit_events?target_guids=%s", s.Guid)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", url)
 	if err != nil {
 		return errors.Wrap(err, "Couldn't retrieve events for service instance")
@@ -38,8 +37,8 @@ func (p *Plugin) ServiceEvents(c plugin.CliConnection, serviceInstanceName strin
 		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
-	if res.ErrorCode != "" {
-		return fmt.Errorf("Error response from server: %s", res.Description)
+	if len(res.Errors) > 0 {
+		return fmt.Errorf("error response from server: %s", res.Errors[0].Detail)
 	}
 
 	p.ui.Say(terminal.SuccessColor("OK\n"))
@@ -48,7 +47,7 @@ func (p *Plugin) ServiceEvents(c plugin.CliConnection, serviceInstanceName strin
 	if len(events) > 0 {
 		table := p.ui.Table([]string{"time", "event", "actor"})
 		for _, e := range events {
-			table.Add(e.Metadata.CreatedAt.Format(time.RFC3339), e.Entity.Type, e.Entity.ActorName)
+			table.Add(e.CreatedAt, e.Type, e.Actor.Name)
 		}
 		err := table.Print()
 		if err != nil {

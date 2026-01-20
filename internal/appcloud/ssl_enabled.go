@@ -17,12 +17,12 @@ func (p *Plugin) SSLEnabled(c plugin.CliConnection, domain string, hostname stri
 		return errors.Wrap(err, "Couldn't get your username")
 	}
 
-	fullDomain := domain
+	fqdn := domain
 	if hostname != "" {
-		fullDomain = strings.Join([]string{hostname, domain}, ".")
+		fqdn = strings.Join([]string{hostname, domain}, ".")
 	}
 
-	p.ui.Say("Checking SSL status for %s as %s...", terminal.EntityNameColor(fullDomain), terminal.EntityNameColor(un))
+	p.ui.Say("Checking SSL status for %s as %s...", terminal.EntityNameColor(fqdn), terminal.EntityNameColor(un))
 
 	s, err := c.GetCurrentSpace()
 	if err != nil {
@@ -43,27 +43,27 @@ func (p *Plugin) SSLEnabled(c plugin.CliConnection, domain string, hostname stri
 	}
 
 	if res.ErrorCode != "" {
-		return fmt.Errorf("Error response from server: %s", res.Description)
+		return fmt.Errorf("error response from server: %s", res.Description)
 	}
 
 	p.ui.Say(terminal.SuccessColor("OK\n"))
 
 	var enabled bool
 	for _, cert := range res.Resources {
-		if cert.Entity.FullDomainName == fullDomain {
+		if cert.Entity.FullDomainName == fqdn {
 			enabled = true
 			break
 		}
 	}
 
 	if !enabled {
-		sharedDomains, err := getSharedDomains(c)
+		sharedDomains, err := getOrgDomains(c)
 		if err != nil {
-			return errors.Wrap(err, "Couldn't get shared domains")
+			return errors.Wrap(err, "Couldn't get org domains")
 		}
 
 		for _, d := range sharedDomains {
-			if d.Entity.Name == domain {
+			if d.Name == domain {
 				enabled = true
 				break
 			}
@@ -71,9 +71,9 @@ func (p *Plugin) SSLEnabled(c plugin.CliConnection, domain string, hostname stri
 	}
 
 	if enabled {
-		p.ui.Say("SSL is enabled for '%s'", fullDomain)
+		p.ui.Say("SSL is enabled for '%s'", fqdn)
 	} else {
-		p.ui.Say("SSL is not enabled for '%s'", fullDomain)
+		p.ui.Say("SSL is not enabled for '%s'", fqdn)
 	}
 
 	return nil

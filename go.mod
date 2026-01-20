@@ -1,6 +1,6 @@
 module github.com/swisscom/appcloud-cf-cli-plugin
 
-go 1.17
+go 1.25.6
 
 require (
 	code.cloudfoundry.org/cli v7.1.0+incompatible
@@ -51,7 +51,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1 // indirect
 	google.golang.org/grpc v1.42.0 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.28 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
