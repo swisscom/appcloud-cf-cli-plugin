@@ -12,3 +12,6 @@ clean:
 	@rm bin/appcloud-cf-cli-plugin_* -f
 
 all: clean build
+
+sha:
+	@sha1sum bin/appcloud-cf-cli-plugin_*
