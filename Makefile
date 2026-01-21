@@ -1,5 +1,7 @@
 .PHONY: all build clean
 
+all: clean build
+
 build:
 	GOOS=linux   GOARCH=386   go build -o bin/appcloud-cf-cli-plugin_linux32
 	GOOS=linux   GOARCH=amd64 go build -o bin/appcloud-cf-cli-plugin_linux64
@@ -11,7 +13,9 @@ build:
 clean:
 	@rm bin/appcloud-cf-cli-plugin_* -f
 
-all: clean build
-
 sha:
 	@sha1sum bin/appcloud-cf-cli-plugin_*
+
+release:
+	@echo release plugin - see https://github.com/swisscom/appcloud-cf-cli-plugin/releases
+	@echo open plugin repo PR - see https://github.com/cloudfoundry/cli-plugin-repo/pull/519
