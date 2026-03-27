@@ -3,6 +3,7 @@
 all: clean build
 
 build:
+	@echo "Did you update the version in main.go/PluginMetadata?"
 	CGO_ENABLED=0 GOOS=linux   GOARCH=386   go build -o bin/appcloud-cf-cli-plugin_linux32
 	CGO_ENABLED=0 GOOS=linux   GOARCH=amd64 go build -o bin/appcloud-cf-cli-plugin_linux64
 	CGO_ENABLED=0 GOOS=darwin  GOARCH=amd64 go build -o bin/appcloud-cf-cli-plugin_osx
