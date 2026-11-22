@@ -1,6 +1,6 @@
 .PHONY: all build clean
 
-all: clean build
+all: clean build sha
 
 build:
 	@echo "Did you update the version in main.go/PluginMetadata?"
@@ -12,7 +12,7 @@ build:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o bin/appcloud-cf-cli-plugin_win64.exe
 
 clean:
-	@rm bin/appcloud-cf-cli-plugin_* -f
+	@rm -f bin/appcloud-cf-cli-plugin_*
 
 sha:
 	@sha1sum bin/appcloud-cf-cli-plugin_*
