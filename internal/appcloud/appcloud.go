@@ -3,11 +3,13 @@ package appcloud
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/flags"
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/trace"
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v8/cf/flags"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/cf/trace"
+	"code.cloudfoundry.org/cli/v8/plugin"
 )
+
+// v8 "code.cloudfoundry.org/cli/v8"
 
 // Plugin is the Swisscom Application Cloud cf CLI plugin.
 type Plugin struct {

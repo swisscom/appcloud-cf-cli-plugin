@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v8/plugin"
 	"github.com/pkg/errors"
 )
 

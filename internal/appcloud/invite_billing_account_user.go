@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/plugin"
 	"github.com/pkg/errors"
 )
 
@@ -42,7 +42,6 @@ func (p *Plugin) InviteBillingAccountUser(c plugin.CliConnection, invitee string
 
 	url := "/custom/account_invitations"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-H", "Content-Type: application/json", "-X", "POST", url, "-d", string(argsData))
-
 	if err != nil {
 		return errors.Wrap(err, "Couldn't invite user to billing account")
 	}

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/plugin"
 	"github.com/pkg/errors"
 )
 
@@ -39,7 +39,6 @@ func (p *Plugin) DisableSSL(c plugin.CliConnection, domain string, hostname stri
 	}
 	url := "/custom/certifications/uninstall"
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", "-X", "PUT", url, "-d", string(reqData))
-
 	if err != nil {
 		return errors.Wrap(err, "Couldn't disable SSL for route")
 	}

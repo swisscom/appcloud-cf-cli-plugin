@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"code.cloudfoundry.org/cli/plugin"
+	"code.cloudfoundry.org/cli/v8/plugin"
 	"github.com/pkg/errors"
 )
 
@@ -28,7 +28,6 @@ func getBillingAccount(c plugin.CliConnection, name string) (BillingAccount, err
 	expression := url.QueryEscape("name_number:" + name)
 	accURL := fmt.Sprintf("/custom/accounts?q=%s", expression)
 	resLines, err := c.CliCommandWithoutTerminalOutput("curl", accURL)
-
 	if err != nil {
 		return BillingAccount{}, errors.Wrap(err, "Billing Account not found")
 	}
