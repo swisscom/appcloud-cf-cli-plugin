@@ -19,7 +19,7 @@ func (p *Plugin) ServiceEvents(c plugin.CliConnection, serviceInstanceName strin
 
 	p.ui.Say("Getting events for service instance %s as %s...", terminal.EntityNameColor(serviceInstanceName), terminal.EntityNameColor(un))
 
-	s, err := c.GetService(serviceInstanceName)
+	s, err := getService(c, serviceInstanceName)
 	if err != nil {
 		return errors.Wrap(err, "Service instance not found")
 	}
