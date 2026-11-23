@@ -22,8 +22,8 @@ func (p *Plugin) GetMetadata() plugin.PluginMetadata {
 		Name: "Swisscom Application Cloud",
 		Version: plugin.VersionType{
 			Major: 0,
-			Minor: 3,
-			Build: 3,
+			Minor: 4,
+			Build: 0,
 		},
 		Commands: []plugin.Command{
 			// Backups
