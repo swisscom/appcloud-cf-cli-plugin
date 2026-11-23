@@ -19,7 +19,7 @@ func (p *Plugin) OrgInvitations(c plugin.CliConnection, orgName string) error {
 
 	p.ui.Say("Gettings invitations to org %s as %s...", terminal.EntityNameColor(orgName), terminal.EntityNameColor(un))
 
-	o, err := c.GetOrg(orgName)
+	o, err := getOrg(c, orgName)
 	if err != nil {
 		return errors.Wrap(err, "Org not found")
 	}

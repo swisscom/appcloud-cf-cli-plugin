@@ -105,7 +105,7 @@ func (p *Plugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "invite-billing-account-user",
 				HelpText: `Invite a user to a billing account as an 'account owner'. The account can be specified by number (e.g.: F26AADDL00) or full name`,
 				UsageDetails: plugin.Usage{
-					Usage: "invite-org-user USERNAME BILLING_ACCOUNT",
+					Usage: "invite-billing-account-user USERNAME BILLING_ACCOUNT",
 				},
 			},
 			{

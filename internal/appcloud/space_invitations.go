@@ -19,7 +19,7 @@ func (p *Plugin) SpaceInvitations(c plugin.CliConnection, spaceName string) erro
 
 	p.ui.Say("Gettings invitations to space %s as %s...", terminal.EntityNameColor(spaceName), terminal.EntityNameColor(un))
 
-	s, err := c.GetSpace(spaceName)
+	s, err := getSpace(c, spaceName)
 	if err != nil {
 		return errors.Wrap(err, "Space not found")
 	}

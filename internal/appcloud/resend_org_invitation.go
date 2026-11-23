@@ -19,7 +19,7 @@ func (p *Plugin) ResendOrgInvitation(c plugin.CliConnection, invitee string, org
 
 	p.ui.Say("Resending invitation for %s to org %s as %s...", terminal.EntityNameColor(invitee), terminal.EntityNameColor(orgName), terminal.EntityNameColor(un))
 
-	o, err := c.GetOrg(orgName)
+	o, err := getOrg(c, orgName)
 	if err != nil {
 		return errors.Wrap(err, "Org not found")
 	}

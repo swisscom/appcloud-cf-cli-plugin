@@ -25,7 +25,7 @@ func (p *Plugin) InviteSpaceUser(c plugin.CliConnection, invitee string, spaceNa
 
 	p.ui.Say("Inviting %s to space %s as %s...", terminal.EntityNameColor(invitee), terminal.EntityNameColor(spaceName), terminal.EntityNameColor(un))
 
-	s, err := c.GetSpace(spaceName)
+	s, err := getSpace(c, spaceName)
 	if err != nil {
 		return errors.Wrap(err, "Space not found")
 	}

@@ -19,7 +19,7 @@ func (p *Plugin) ResendSpaceInvitation(c plugin.CliConnection, invitee string, s
 
 	p.ui.Say("Resending invitation for %s to space %s as %s...", terminal.EntityNameColor(invitee), terminal.EntityNameColor(spaceName), terminal.EntityNameColor(un))
 
-	s, err := c.GetSpace(spaceName)
+	s, err := getSpace(c, spaceName)
 	if err != nil {
 		return errors.Wrap(err, "Space not found")
 	}

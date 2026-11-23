@@ -25,7 +25,7 @@ func (p *Plugin) InviteOrgUser(c plugin.CliConnection, invitee string, orgName s
 
 	p.ui.Say("Inviting %s to org %s as %s...", terminal.EntityNameColor(invitee), terminal.EntityNameColor(orgName), terminal.EntityNameColor(un))
 
-	o, err := c.GetOrg(orgName)
+	o, err := getOrg(c, orgName)
 	if err != nil {
 		return errors.Wrap(err, "Org not found")
 	}
@@ -56,12 +56,12 @@ func (p *Plugin) InviteOrgUser(c plugin.CliConnection, invitee string, orgName s
 		return errors.Wrap(err, "Couldn't read JSON response from server")
 	}
 
+	// add response validation
 	if res.Entity.Status != StatusSent && res.Entity.Status != StatusConfirmed {
 		return errors.Wrap(err, "Couldn't send invitation")
 	}
 
 	p.ui.Say(terminal.SuccessColor("OK\n"))
-
 	p.ui.Say("Invitation sent")
 
 	return nil

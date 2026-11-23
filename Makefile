@@ -20,3 +20,8 @@ sha:
 release:
 	@echo release plugin - see https://github.com/swisscom/appcloud-cf-cli-plugin/releases
 	@echo open plugin repo PR - see https://github.com/cloudfoundry/cli-plugin-repo/pull/519
+
+dev:
+	CGO_ENABLED=0 GOOS=darwin  GOARCH=arm64 go build -o bin/appcloud-cf-cli-plugin_osx_arm64
+	cf install-plugin -f bin/appcloud-cf-cli-plugin_osx_arm64
+	cf plugins
