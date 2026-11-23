@@ -19,7 +19,7 @@ func (p *Plugin) CreateBackup(c plugin.CliConnection, serviceInstanceName string
 
 	p.ui.Say("Creating backup for service instance %s as %s...", terminal.EntityNameColor(serviceInstanceName), terminal.EntityNameColor(un))
 
-	s, err := c.GetService(serviceInstanceName)
+	s, err := getService(c, serviceInstanceName)
 	if err != nil {
 		return errors.Wrap(err, "Service instance not found")
 	}
